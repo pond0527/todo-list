@@ -1,19 +1,32 @@
 import clsx from 'clsx';
-import styles from '../todo.module.scss';
-import { TodoFormType } from 'types/todo/type.d';
-import { useForm } from 'react-hook-form';
+import styles from './todo.module.scss';
+import { Member, Status, TodoFormType } from 'types/todo/type.d';
+import { useFormContext } from 'react-hook-form';
 
-export const NewTodo = ({ todoId }: { todoId: number }) => {
-    const {
-        register,
-        handleSubmit,
-    } = useForm<TodoFormType>();
+type Props = {
+    todoId: number;
+    memberList: Member[];
+    statusList: Status[];
+    onComplate?: VoidFunction;
+    onBack?: VoidFunction;
+};
+
+export const TodoForm = ({
+    todoId,
+    onComplate,
+    onBack,
+    statusList,
+    memberList,
+}: Props) => {
+    const { register, handleSubmit } = useFormContext<TodoFormType>();
 
     const onSubmit = async (data: TodoFormType) => {
-        return fetch(`http://localhost:3000/api/todo/${todoId}`, {
+        await fetch(`http://localhost:3000/api/todo/${todoId}`, {
             method: 'POST',
             body: JSON.stringify(data),
         });
+
+        onComplate?.();
     };
 
     return (
@@ -35,11 +48,11 @@ export const NewTodo = ({ todoId }: { todoId: number }) => {
                         {...register('status')}
                         defaultValue="0"
                     >
-                        <option value="0">Open</option>
-                        <option value="1">Doing</option>
-                        <option value="2">Pending</option>
-                        <option value="3">Warn</option>
-                        <option value="4">Done</option>
+                        {statusList.map((status) => (
+                            <option key={status.id} value={status.id}>
+                                {status.label}
+                            </option>
+                        ))}
                     </select>
                 </div>
 
@@ -52,11 +65,11 @@ export const NewTodo = ({ todoId }: { todoId: number }) => {
                         {...register('assignment')}
                         defaultValue="0"
                     >
-                        <option value="0">XX</option>
-                        <option value="1">Doing</option>
-                        <option value="2">Pending</option>
-                        <option value="3">Warn</option>
-                        <option value="4">Done</option>
+                        {memberList.map((member) => (
+                            <option key={member.id} value={member.id}>
+                                {member.name}
+                            </option>
+                        ))}
                     </select>
                 </div>
 
@@ -70,7 +83,19 @@ export const NewTodo = ({ todoId }: { todoId: number }) => {
                     />
                 </div>
 
-                <input type="submit" />
+                <button
+                    type="submit"
+                    className={clsx('btn btn-primary me-3', styles.btn)}
+                >
+                    保存
+                </button>
+                <button
+                    type="button"
+                    className={clsx('btn btn-secondary', styles.btn)}
+                    onClick={onBack}
+                >
+                    閉じる
+                </button>
             </div>
         </form>
     );

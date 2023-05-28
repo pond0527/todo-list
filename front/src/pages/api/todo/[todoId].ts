@@ -15,17 +15,17 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<ApiResoinse<boo
     }
 };
 
-const createTodoList = async (id: number, todo: TodoFormType) => {
+const createTodoList = async (todoId: number, todo: TodoFormType) => {
     const todoList = await getTodoList();
-    if(todoList.filter(o => o.id === id).length > 0) {
+    const otherTodo = todoList.filter(o => o.id !== todoId);
+    if(todoList.length > otherTodo.length) {
         // データ不正
-        console.log("failed data conflict");
-        return false;
+        console.warn(`${todoId} is conflict to override`);
     }
 
     todoList.push({
         ...todo,
-        id: id,
+        id: todoId,
         createAt: new Date(),
     } as TodoListJsonData);
 

@@ -16,6 +16,7 @@
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.43.9",
     "react-hot-toast": "^2.4.1",
+    "react-modal": "^3.16.1",
     "react-router-dom": "6",
     "react-scripts": "5.0.1",
     "sass": "^1.62.1",
@@ -51,6 +52,7 @@
     ]
   },
   "devDependencies": {
+    "@types/react-modal": "^3.16.0",
     "clsx": "^1.2.1",
     "prettier": "^2.8.8"
   }

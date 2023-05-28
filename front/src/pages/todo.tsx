@@ -1,18 +1,31 @@
-import { TodoListJsonData } from 'types/todo/type.d';
+import {
+    Member,
+    Status,
+    TodoFormType,
+    TodoListJsonData,
+} from 'types/todo/type.d';
 import { ApiResoinse } from 'types/api/type.d';
-import styles from './todo.module.scss';
+import styles from 'components/Todo/todo.module.scss';
 import clsx from 'clsx';
 import { Layout } from 'components/Layout';
-import { useEffect, useState } from 'react';
-import { NewTodo } from 'pages/todo/[todoId]';
+import { useCallback, useEffect, useState } from 'react';
 import type { GetServerSidePropsResult } from 'next';
+import ReactModal from 'react-modal';
+import { useToast } from 'lib/toast';
+import { TodoForm } from 'components/Todo';
+import { FormProvider, useForm } from 'react-hook-form';
+import { useRouter } from 'next/router';
 
 type Props = {
     todoList: TodoListJsonData[];
+    memberList: Member[];
+    statusList: Status[];
 };
 
-const TodoList = ({ todoList }: Props) => {
-    const [isNewArea, setIsNewArea] = useState(false);
+const TodoList = ({ todoList, memberList, statusList }: Props) => {
+    const router = useRouter();
+    const [isOpenFormModal, setIsOpenFormModal] = useState(false);
+    const { toast, Toaster } = useToast();
     useEffect(() => {
         console.log('## start TodoList');
         console.log('todoList: ', todoList);
@@ -23,6 +36,31 @@ const TodoList = ({ todoList }: Props) => {
         };
     }, [todoList]);
 
+    const useFormMethods = useForm<TodoFormType>();
+
+    const handleEditTodo = useCallback(
+        (todoId: number) => {
+            const editTodo = todoList.find((o) => o.id === todoId);
+            useFormMethods.reset(editTodo);
+            setIsOpenFormModal(true);
+        },
+        [useFormMethods, todoList],
+    );
+
+    const handleBack = useCallback(() => {
+        setIsOpenFormModal(false);
+        // TODO: フォームの初期化
+        useFormMethods.reset();
+    }, [useFormMethods]);
+
+    const handleComplateNewTodo = useCallback(() => {
+        setIsOpenFormModal(false);
+        // TODO: フォームの初期化
+        useFormMethods.reset();
+        toast.success('Todoを保存しました。');
+        router.reload();
+    }, [router, useFormMethods, toast]);
+
     return (
         <Layout
             pageTitle="TODOリスト"
@@ -30,15 +68,13 @@ const TodoList = ({ todoList }: Props) => {
                 <>
                     <button
                         className={clsx('btn btn-primary', styles.btn)}
-                        onClick={() => setIsNewArea(true)}
+                        onClick={() => setIsOpenFormModal(true)}
                     >
                         新規作成
                     </button>
                 </>
             }
         >
-            {isNewArea && <NewTodo todoId={todoList.length * 1} />}
-
             <label className={clsx('form-label', styles.labelName)}>一覧</label>
             <table className="table">
                 <thead>
@@ -53,17 +89,48 @@ const TodoList = ({ todoList }: Props) => {
                 </thead>
                 <tbody>
                     {todoList.map((todo) => (
-                        <tr key={todo.id}>
+                        <tr
+                            key={todo.id}
+                            onClick={() => handleEditTodo(todo.id)}
+                        >
                             <td>{todo.title}</td>
-                            <td>{todo.status}</td>
+                            <td>
+                                {statusList?.find((o) => o.id === todo.status)
+                                    ?.label ?? '-'}
+                            </td>
                             <td>{todo.detail}</td>
-                            <td>{todo.assignment}</td>
+                            <td>
+                                {memberList?.find(
+                                    (o) => o.id === todo.assignment,
+                                )?.name ?? '-'}
+                            </td>
                             <td>{todo.createAt.toLocaleString()}</td>
                             <td>{todo.updateAt?.toLocaleString() || '-'}</td>
                         </tr>
                     ))}
                 </tbody>
             </table>
+
+            <FormProvider {...useFormMethods}>
+                <ReactModal
+                    isOpen={isOpenFormModal}
+                    overlayClassName="overlay"
+                    ariaHideApp={false}
+                    onRequestClose={() => {
+                        setIsOpenFormModal(false);
+                    }}
+                >
+                    <TodoForm
+                        todoId={todoList.length + 1}
+                        memberList={memberList}
+                        statusList={statusList}
+                        onComplate={handleComplateNewTodo}
+                        onBack={handleBack}
+                    />
+                </ReactModal>
+            </FormProvider>
+
+            <Toaster />
         </Layout>
     );
 };
@@ -74,6 +141,16 @@ export const getServerSideProps = async (
     context: any,
 ): Promise<GetServerSidePropsResult<Props>> => {
     console.log('## start getServerSideProps');
+    const todoList = await getTodoList();
+    const memberList = await getMemberList();
+    const statusList = await getStatusList();
+    console.log('## end getServerSideProps');
+    return {
+        props: { todoList, memberList, statusList }, // will be passed to the page component as props
+    };
+};
+
+const getTodoList = async (): Promise<TodoListJsonData[]> => {
     const response = await fetch(`http://localhost:3000/api/todo`, {
         method: 'GET',
     });
@@ -81,11 +158,26 @@ export const getServerSideProps = async (
     const responseBody = (await response.json()) as ApiResoinse<
         TodoListJsonData[]
     >;
-    console.log('responseBody: ', responseBody);
-    console.log(typeof responseBody.data);
 
-    console.log('## end getServerSideProps');
-    return {
-        props: { todoList: responseBody.data }, // will be passed to the page component as props
-    };
+    return responseBody.data;
+};
+
+const getMemberList = async (): Promise<Member[]> => {
+    const response = await fetch(`http://localhost:3000/api/member`, {
+        method: 'GET',
+    });
+
+    const responseBody = (await response.json()) as ApiResoinse<Member[]>;
+
+    return responseBody.data;
+};
+
+const getStatusList = async (): Promise<Status[]> => {
+    const response = await fetch(`http://localhost:3000/api/status`, {
+        method: 'GET',
+    });
+
+    const responseBody = (await response.json()) as ApiResoinse<Status[]>;
+
+    return responseBody.data;
 };

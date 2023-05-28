@@ -6,9 +6,20 @@ export type TodoFormType = Pick<
 export type TodoListJsonData = {
     id: number;
     title: string;
-    status: '0' | '1' | '2' | '3' | '4';
+    status: string;
     assignment: string;
     detail: string;
     createAt: Date;
     updateAt?: Date;
 };
+
+
+export type Member = {
+    id: string,
+    name: string,
+}
+
+export type Status = {
+    id: string,
+    label: string,
+}
