@@ -1,9 +1,10 @@
-import { ApiResoinse, TodoListJsonData } from 'components/Todo/types';
-import styles from 'components/Todo/todo.module.scss';
+import { TodoListJsonData } from 'types/todo/type.d';
+import { ApiResoinse } from 'types/api/type.d';
+import styles from './todo.module.scss';
 import clsx from 'clsx';
 import { Layout } from 'components/Layout';
 import { useEffect, useState } from 'react';
-import { NewTodo } from 'components/Todo/NewTodo';
+import { NewTodo } from 'pages/todo/[todoId]';
 import type { GetServerSidePropsResult } from 'next';
 
 type Props = {

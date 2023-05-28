@@ -1,4 +1,5 @@
-import { TodoListJsonData, TodoFormType, ApiResoinse } from 'components/Todo/types';
+import { TodoListJsonData, TodoFormType } from 'types/todo/type.d';
+import { ApiResoinse } from 'types/api/type.d';
 import { NextApiRequest, NextApiResponse } from 'next';
 import * as fs from 'node:fs/promises';
 import { TODO_LIST_FILEPATH, getTodoList } from '../todo';

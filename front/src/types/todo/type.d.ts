@@ -12,7 +12,3 @@ export type TodoListJsonData = {
     createAt: Date;
     updateAt?: Date;
 };
-
-export type ApiResoinse<T> = {
-    data: T;
-};

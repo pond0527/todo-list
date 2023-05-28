@@ -1,14 +1,12 @@
 import clsx from 'clsx';
-import styles from './todo.module.scss';
-import { TodoFormType, TodoListJsonData } from './types';
+import styles from '../todo.module.scss';
+import { TodoFormType } from 'types/todo/type.d';
 import { useForm } from 'react-hook-form';
 
 export const NewTodo = ({ todoId }: { todoId: number }) => {
     const {
         register,
         handleSubmit,
-        watch,
-        formState: { errors },
     } = useForm<TodoFormType>();
 
     const onSubmit = async (data: TodoFormType) => {
