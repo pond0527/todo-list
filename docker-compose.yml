@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+ todo-list-app:
+  build:
+   context: .
+  volumes:
+   - ./front/share:/app/share
+  ports:
+   - "127.0.0.1:3000:3000"

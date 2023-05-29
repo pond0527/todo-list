@@ -1,6 +1,6 @@
 export type TodoFormType = Pick<
     TodoListJsonData,
-    'title' | 'status' | 'assignment' | 'detail'
+    'id' | 'title' | 'status' | 'assignment' | 'detail'
 >;
 
 export type TodoListJsonData = {

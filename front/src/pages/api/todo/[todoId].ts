@@ -4,31 +4,51 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import * as fs from 'node:fs/promises';
 import { TODO_LIST_FILEPATH, getTodoList } from '../todo';
 
-const handler = async (req: NextApiRequest, res: NextApiResponse<ApiResoinse<boolean>>) => {
+const handler = async (
+    req: NextApiRequest,
+    res: NextApiResponse<ApiResoinse<boolean>>,
+) => {
     console.log(req.query, req.body);
     const { todoId } = req.query;
     if (req.method === 'POST') {
-        const result = await createTodoList(Number(todoId), JSON.parse(req.body) as TodoFormType);
-        res.status(200).json({data: result});
+        const result = await upsertTodo(
+            Number(todoId),
+            JSON.parse(req.body) as TodoFormType,
+        );
+        res.status(200).json({ data: result });
+    } else if (req.method === 'DELETE') {
+        const result = await deleteTodo(Number(todoId));
+        res.status(200).json({ data: result });
     } else {
         res.status(403);
     }
 };
 
-const createTodoList = async (todoId: number, todo: TodoFormType) => {
+const upsertTodo = async (todoId: number, todoForm: TodoFormType) => {
     const todoList = await getTodoList();
-    const otherTodo = todoList.filter(o => o.id !== todoId);
-    if(todoList.length > otherTodo.length) {
-        // データ不正
+    const matchedTargetTodo = todoList.find((o) => o.id === todoId);
+    let todo: TodoListJsonData;
+    if (matchedTargetTodo) {
+        // 存在するデータは上書きするので警告しておく
         console.warn(`${todoId} is conflict to override`);
+        todo = { ...matchedTargetTodo, ...todoForm, updateAt: new Date() };
+    } else {
+        todo = { ...todoForm, id: todoId, createAt: new Date() };
     }
 
-    todoList.push({
-        ...todo,
-        id: todoId,
-        createAt: new Date(),
-    } as TodoListJsonData);
+    const updateTodoList: TodoListJsonData[] = todoList
+        .filter((o) => o.id !== todoId)
+        .concat([todo]);
 
+    return save(updateTodoList);
+};
+
+const deleteTodo = async (todoId: number) => {
+    const todoList = await getTodoList();
+    return save(todoList.filter((o) => o.id !== todoId));
+};
+
+const save = (todoList: TodoListJsonData[]): boolean => {
     try {
         fs.writeFile(TODO_LIST_FILEPATH, JSON.stringify(todoList));
         return true;
