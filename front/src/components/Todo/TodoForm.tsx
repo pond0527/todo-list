@@ -11,14 +11,14 @@ type Props = {
     todoId: number;
     memberList: Member[];
     statusList: Status[];
-    onComplate?: VoidFunction;
+    onComplete?: VoidFunction;
     onBack?: VoidFunction;
 };
 
 export const TodoForm = ({
     mode,
     todoId,
-    onComplate,
+    onComplete: onComplate,
     onBack,
     statusList,
     memberList,

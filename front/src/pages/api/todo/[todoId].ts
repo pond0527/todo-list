@@ -6,7 +6,7 @@ import { TODO_LIST_FILEPATH, getTodoList } from '../todo';
 
 const handler = async (
     req: NextApiRequest,
-    res: NextApiResponse<ApiResoinse<boolean>>,
+    res: NextApiResponse<ApiResoinse<boolean|TodoListJsonData>>,
 ) => {
     console.log(req.query, req.body);
     const { todoId } = req.query;
@@ -16,6 +16,14 @@ const handler = async (
             JSON.parse(req.body) as TodoFormType,
         );
         res.status(200).json({ data: result });
+    } else if (req.method === 'GET') {
+        const todoList = await getTodoList();
+        const todo = todoList.find((o) => o.id === Number(todoId));
+        if(todo) {
+            res.status(200).json({data: todo});
+        } else {
+            res.status(400);
+        }
     } else if (req.method === 'DELETE') {
         const result = await deleteTodo(Number(todoId));
         res.status(200).json({ data: result });

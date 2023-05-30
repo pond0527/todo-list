@@ -15,52 +15,44 @@ import { useToast } from 'lib/toast';
 import { TodoForm } from 'components/Todo';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 
 type Props = {
-    todoList: TodoListJsonData[];
     memberList: Member[];
     statusList: Status[];
 };
 
-const TodoList = ({ todoList, memberList, statusList }: Props) => {
+const TodoList = ({ memberList, statusList }: Props) => {
     const router = useRouter();
+    
+    const [todoList, setTodoList] = useState<TodoListJsonData[]>([]);
+    useEffect(() => {
+        if (!router.isReady) {
+            return;
+        }
+
+        (async () => {
+            const todoList = await getTodoList();
+            setTodoList(todoList);
+        })();
+    }, [router]);
+
     const [isOpenFormModal, setIsOpenFormModal] = useState(false);
     const { toast, Toaster } = useToast();
-    const [isEdit, setIsEdit] = useState(false);
     const useFormMethods = useForm<TodoFormType>();
-
-    const handleEditTodo = useCallback(
-        (todoId: number) => {
-            setIsEdit(true);
-            useFormMethods.resetField('id', {
-                defaultValue: todoId,
-                keepDirty: true,
-            });
-
-            const editTodo = todoList.find((o) => o.id === todoId);
-            useFormMethods.reset(editTodo);
-            setIsOpenFormModal(true);
-        },
-        [useFormMethods, todoList],
-    );
 
     const handleBack = useCallback(() => {
         setIsOpenFormModal(false);
-        setIsEdit(false);
 
-        // TODO: フォームの初期化
-        useFormMethods.reset({ id: todoList.length + 1 });
-    }, [useFormMethods, todoList]);
-
-    const handleComplateNewTodo = useCallback(() => {
-        setIsOpenFormModal(false);
-
-        // TODO: フォームの初期化
+        // フォームの初期化
         useFormMethods.reset();
-        toast.success('保存しました。');
+    }, [useFormMethods]);
 
+    const handleComplete = useCallback(() => {
+        setIsOpenFormModal(false);
+        toast.success('保存しました。');
         router.reload();
-    }, [router, useFormMethods, toast]);
+    }, [router, toast]);
 
     return (
         <Layout
@@ -95,25 +87,26 @@ const TodoList = ({ todoList, memberList, statusList }: Props) => {
                         .map((todo) => (
                             <tr
                                 key={todo.id}
-                                onClick={() => handleEditTodo(todo.id)}
+                                onClick={() => router.push(`/todo/${todo.id}`)}
                             >
                                 <td>{todo.title}</td>
-                                <td suppressHydrationWarning>
+                                <td>
                                     {statusList.find(
                                         (o) => o.id === todo.status,
                                     )?.label || '-'}
                                 </td>
-                                <td suppressHydrationWarning>{todo.detail}</td>
-                                <td suppressHydrationWarning>
+                                <td>{todo.detail}</td>
+                                <td>
                                     {memberList.find(
                                         (o) => o.id === todo.assignment,
                                     )?.name || '-'}
                                 </td>
-                                <td suppressHydrationWarning>
-                                    {todo.createAt.toLocaleString()}
+                                <td>
+                                    {todo.createAt.toLocaleString('ja-JP')}
                                 </td>
-                                <td suppressHydrationWarning>
-                                    {todo.updateAt?.toLocaleString() || '-'}
+                                <td>
+                                    {todo.updateAt?.toLocaleString('ja-JP') ||
+                                        '-'}
                                 </td>
                             </tr>
                         ))}
@@ -130,11 +123,11 @@ const TodoList = ({ todoList, memberList, statusList }: Props) => {
                     }}
                 >
                     <TodoForm
-                        mode={isEdit ? 'edit' : 'new'}
-                        todoId={useFormMethods.getValues('id')}
+                        mode={'new'}
+                        todoId={todoList.length + 1}
                         memberList={memberList}
                         statusList={statusList}
-                        onComplate={handleComplateNewTodo}
+                        onComplete={handleComplete}
                         onBack={handleBack}
                     />
                 </ReactModal>
@@ -151,12 +144,11 @@ export const getServerSideProps = async (
     context: any,
 ): Promise<GetServerSidePropsResult<Props>> => {
     console.log('## start getServerSideProps');
-    const todoList = await getTodoList();
     const memberList = await getMemberList();
     const statusList = await getStatusList();
     console.log('## end getServerSideProps');
     return {
-        props: { todoList, memberList, statusList },
+        props: { memberList, statusList },
     };
 };
 
