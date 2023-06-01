@@ -17,6 +17,16 @@
     // column-gap: 5px;
 }
 
+.dataRow {
+    &.warn {
+        background-color: lightyellow;
+    }
+
+    &.done {
+        background-color: lightGray;
+    }
+}
+
 .formGroup {
     // display: flex;
     // flex-direction: column;
