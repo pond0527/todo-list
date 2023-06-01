@@ -4,11 +4,10 @@ import {
     TodoFormType,
     TodoListJsonData,
 } from 'types/todo/type.d';
-import { ApiResoinse } from 'types/api/type.d';
 import styles from 'components/Todo/todo.module.scss';
 import clsx from 'clsx';
 import { Layout } from 'components/Layout';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { GetServerSidePropsResult } from 'next';
 import ReactModal from 'react-modal';
 import { useToast } from 'lib/toast';
@@ -16,9 +15,11 @@ import { TodoForm } from 'components/Todo';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
+import { createTodoId, getTodoList } from 'lib/clients/todoClient';
+import { getMemberList } from 'lib/clients/memberClient';
+import { getStatusList } from 'lib/clients/statusClient';
 
 type Props = {
-    todoList: TodoListJsonData[];
     memberList: Member[];
     statusList: Status[];
 };
@@ -27,6 +28,8 @@ const TodoList = ({ memberList, statusList }: Props) => {
     const router = useRouter();
 
     const [todoList, setTodoList] = useState<TodoListJsonData[]>([]);
+    const [newTodoId, setNewTodoId] = useState<number>(todoList.length + 1);
+
     useEffect(() => {
         if (!router.isReady) {
             return;
@@ -35,18 +38,26 @@ const TodoList = ({ memberList, statusList }: Props) => {
         (async () => {
             const todoList = await getTodoList();
             setTodoList(todoList);
+
+            const newTodoId = await createTodoId();
+            setNewTodoId(newTodoId);
         })();
     }, [router.isReady]);
 
     const [isOpenFormModal, setIsOpenFormModal] = useState(false);
     const { toast, Toaster } = useToast();
-    const defaultValues: TodoFormType = {
-        id: todoList.length + 1,
-        title: '',
-        status: '0',
-        assignment: '0',
-        detail: '',
-    };
+
+    const defaultValues = useMemo<TodoFormType>(
+        () => ({
+            id: newTodoId,
+            title: '',
+            status: '0',
+            assignment: '0',
+            detail: '',
+        }),
+        [newTodoId],
+    );
+
     const useFormMethods = useForm<TodoFormType>({
         defaultValues: defaultValues,
     });
@@ -55,15 +66,20 @@ const TodoList = ({ memberList, statusList }: Props) => {
         setIsOpenFormModal(false);
         // フォームの初期化
         useFormMethods.reset(defaultValues);
-    }, [useFormMethods]);
+    }, [useFormMethods, defaultValues]);
 
     const handleComplete = useCallback(async () => {
         const todoList = await getTodoList();
         setTodoList(todoList);
+
+        const newTodoId = await createTodoId();
+        setNewTodoId(newTodoId);
+
         setIsOpenFormModal(false);
         useFormMethods.reset(defaultValues);
+
         toast.success('保存しました。');
-    }, [router, toast]);
+    }, [useFormMethods, defaultValues, toast]);
 
     return (
         <Layout
@@ -160,43 +176,10 @@ export const getServerSideProps = async (): Promise<
     GetServerSidePropsResult<Props>
 > => {
     console.log('## start getServerSideProps');
-    const todoList = await getTodoList();
     const memberList = await getMemberList();
     const statusList = await getStatusList();
     console.log('## end getServerSideProps');
     return {
-        props: { todoList, memberList, statusList },
+        props: { memberList, statusList },
     };
-};
-
-const getTodoList = async (): Promise<TodoListJsonData[]> => {
-    const response = await fetch(`http://localhost:3000/api/todo`, {
-        method: 'GET',
-    });
-
-    const responseBody = (await response.json()) as ApiResoinse<
-        TodoListJsonData[]
-    >;
-
-    return responseBody.data;
-};
-
-const getMemberList = async (): Promise<Member[]> => {
-    const response = await fetch(`http://localhost:3000/api/member`, {
-        method: 'GET',
-    });
-
-    const responseBody = (await response.json()) as ApiResoinse<Member[]>;
-
-    return responseBody.data;
-};
-
-const getStatusList = async (): Promise<Status[]> => {
-    const response = await fetch(`http://localhost:3000/api/status`, {
-        method: 'GET',
-    });
-
-    const responseBody = (await response.json()) as ApiResoinse<Status[]>;
-
-    return responseBody.data;
 };

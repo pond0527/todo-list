@@ -18,7 +18,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<ApiResoinse<Mem
     }
 };
 
-export const getMemberList = async (): Promise<Member[]> => {
+const getMemberList = async (): Promise<Member[]> => {
     try {
         const data = await fs.readFile(MEMBER_LIST_FILEPATH, {encoding: 'utf-8'});
         const list = JSON.parse(data) as Member[];

@@ -4,6 +4,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import * as fs from 'node:fs/promises';
 import { TODO_LIST_FILEPATH, getTodoList } from '../todo';
 
+
 const handler = async (
     req: NextApiRequest,
     res: NextApiResponse<ApiResoinse<boolean|TodoListJsonData>>,
@@ -65,5 +66,6 @@ const save = (todoList: TodoListJsonData[]): boolean => {
         return false;
     }
 };
+
 
 export default handler;
