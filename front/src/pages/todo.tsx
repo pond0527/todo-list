@@ -98,7 +98,11 @@ const TodoList = ({ memberList, statusList }: Props) => {
                 </thead>
                 <tbody>
                     {todoList
-                        .sort((o) => o.id)
+                        .sort((o) => {
+                            return o.updateAt
+                                ? o.updateAt.getTime()
+                                : o.createAt.getTime();
+                        })
                         .reverse()
                         .map((todo) => {
                             return (
