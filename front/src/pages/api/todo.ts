@@ -26,24 +26,12 @@ export const getTodoList = async (): Promise<TodoListJsonData[]> => {
         const data = await fs.readFile(TODO_LIST_FILEPATH, {
             encoding: 'utf-8',
         });
-        const todoList = parsedTodoList(JSON.parse(data));
+        const todoList = JSON.parse(data);
 
         return Promise.resolve(todoList);
     } catch (e: any) {
         return Promise.resolve([]);
     }
-};
-
-const parsedTodoList = (todoList: TodoListJsonData[]) =>
-    todoList.map(parsedTodo);
-
-const parsedTodo = (todo: TodoListJsonData) => {
-    const parsedTodo = { ...todo, createAt: new Date(todo.createAt) };
-    if (todo.updateAt) {
-        parsedTodo.updateAt = new Date(todo.updateAt);
-    }
-
-    return parsedTodo;
 };
 
 export default handler;

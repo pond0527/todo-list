@@ -85,8 +85,8 @@ const TodoList = ({ memberList, statusList }: Props) => {
                 </>
             }
         >
-            <table className="table">
-                <thead>
+            <table className={clsx('table table-hover', styles.table)}>
+                <thead className={'table-light'}>
                     <tr>
                         <th>タイトル</th>
                         <th>ステータス</th>
@@ -110,7 +110,7 @@ const TodoList = ({ memberList, statusList }: Props) => {
                                         todo.status === '3' && styles.warn,
                                     )}
                                 >
-                                    <td>
+                                    <td className={'text-wrap'}>
                                         <Link href={`/todo/${todo.id}`}>
                                             {todo.title}
                                         </Link>
@@ -120,7 +120,9 @@ const TodoList = ({ memberList, statusList }: Props) => {
                                             (o) => o.id === todo.status,
                                         )?.label || '-'}
                                     </td>
-                                    <td>{todo.detail}</td>
+                                    <td className={'text-truncate'}>
+                                        {todo.detail}
+                                    </td>
                                     <td>
                                         {memberList.find(
                                             (o) => o.id === todo.assignment,

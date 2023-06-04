@@ -13,7 +13,7 @@ export const getTodoList = async (): Promise<TodoListJsonData[]> => {
     return parsedTodoList(responseBody.data);
 };
 
-export const getTodo = async (todoId: string): Promise<TodoListJsonData> => {
+export const getTodo = async (todoId: number): Promise<TodoListJsonData> => {
     const response = await fetch(`http://localhost:3000/api/todo/${todoId}`, {
         method: 'GET',
     });

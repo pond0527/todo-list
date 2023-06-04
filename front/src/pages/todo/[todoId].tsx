@@ -4,25 +4,35 @@ import { getStatusList } from 'lib/clients/statusClient';
 import { getTodo } from 'lib/clients/todoClient';
 import { GetServerSidePropsResult } from 'next';
 import { useRouter } from 'next/router';
+import { useLayoutEffect } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import {
     Member,
     Status,
     TodoFormType,
-    TodoListJsonData,
 } from 'types/todo/type';
 
 type Props = {
-    todo: TodoListJsonData;
     memberList: Member[];
     statusList: Status[];
 };
 
-const EditTodo = ({ todo, memberList, statusList }: Props) => {
+const EditTodo = ({ memberList, statusList }: Props) => {
     const router = useRouter();
-    const useFormMethods = useForm<TodoFormType>({
-        defaultValues: { ...todo },
-    });
+    const { todoId } = router.query;
+    const useFormMethods = useForm<TodoFormType>();
+
+    useLayoutEffect(() => {
+        if (!router.isReady || !todoId) {
+            return;
+        }
+
+        (async () => {
+            const todo = await getTodo(Number(todoId));
+            useFormMethods.reset(todo);
+        })();
+    }, [router.isReady, todoId, useFormMethods]);
+
 
     return (
         <FormProvider {...useFormMethods}>
@@ -42,11 +52,10 @@ export default EditTodo;
 export const getServerSideProps = async (
     context: any,
 ): Promise<GetServerSidePropsResult<Props>> => {
-    const todo = await getTodo(context.params.todoId);
     const memberList = await getMemberList();
     const statusList = await getStatusList();
 
     return {
-        props: { todo, memberList, statusList },
+        props: { memberList, statusList },
     };
 };
