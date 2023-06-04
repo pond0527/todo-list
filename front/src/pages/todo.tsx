@@ -7,7 +7,7 @@ import {
 import styles from 'components/Todo/todo.module.scss';
 import clsx from 'clsx';
 import { Layout } from 'components/Layout';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import type { GetServerSidePropsResult } from 'next';
 import ReactModal from 'react-modal';
 import { useToast } from 'lib/toast';
@@ -26,9 +26,7 @@ type Props = {
 
 const TodoList = ({ memberList, statusList }: Props) => {
     const router = useRouter();
-
     const [todoList, setTodoList] = useState<TodoListJsonData[]>([]);
-    const [newTodoId, setNewTodoId] = useState<number>(todoList.length + 1);
 
     useEffect(() => {
         if (!router.isReady) {
@@ -38,48 +36,39 @@ const TodoList = ({ memberList, statusList }: Props) => {
         (async () => {
             const todoList = await getTodoList();
             setTodoList(todoList);
-
-            const newTodoId = await createTodoId();
-            setNewTodoId(newTodoId);
         })();
     }, [router.isReady]);
 
     const [isOpenFormModal, setIsOpenFormModal] = useState(false);
     const { toast, Toaster } = useToast();
 
-    const defaultValues = useMemo<TodoFormType>(
-        () => ({
+    const useFormMethods = useForm<TodoFormType>();
+
+    const handleClickCreate = useCallback(async () => {
+        const newTodoId = await createTodoId();
+        useFormMethods.reset({
             id: newTodoId,
             title: '',
             status: '0',
             assignment: '0',
             detail: '',
-        }),
-        [newTodoId],
-    );
+        });
 
-    const useFormMethods = useForm<TodoFormType>({
-        defaultValues: defaultValues,
-    });
+        setIsOpenFormModal(true);
+    }, [useFormMethods]);
 
     const handleBack = useCallback(() => {
         setIsOpenFormModal(false);
-        // フォームの初期化
-        useFormMethods.reset(defaultValues);
-    }, [useFormMethods, defaultValues]);
+    }, []);
 
     const handleComplete = useCallback(async () => {
+        // リストを最新化
         const todoList = await getTodoList();
         setTodoList(todoList);
 
-        const newTodoId = await createTodoId();
-        setNewTodoId(newTodoId);
-
         setIsOpenFormModal(false);
-        useFormMethods.reset(defaultValues);
-
         toast.success('保存しました。');
-    }, [useFormMethods, defaultValues, toast]);
+    }, [toast]);
 
     return (
         <Layout
@@ -88,7 +77,7 @@ const TodoList = ({ memberList, statusList }: Props) => {
                 <>
                     <button
                         className={clsx('btn btn-primary', styles.btn)}
-                        onClick={() => setIsOpenFormModal(true)}
+                        onClick={handleClickCreate}
                     >
                         新規作成
                     </button>
@@ -156,7 +145,6 @@ const TodoList = ({ memberList, statusList }: Props) => {
                 >
                     <TodoForm
                         mode={'new'}
-                        // todoId={todoList.length + 1}
                         memberList={memberList}
                         statusList={statusList}
                         onComplete={handleComplete}

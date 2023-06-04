@@ -22,9 +22,11 @@ export const TodoForm = ({
                            memberList,
                          }: Props) => {
   const {register, getValues} = useFormContext<TodoFormType>();
+  const targetTodoId = getValues("id");
+  console.log("targetTodoId: ", targetTodoId);
 
   const onSubmit = async (data: TodoFormType) => {
-    await fetch(`http://localhost:3000/api/todo/${getValues("id")}`, {
+    await fetch(`http://localhost:3000/api/todo/${targetTodoId}`, {
       method: 'POST',
       body: JSON.stringify(data),
     });
@@ -33,7 +35,7 @@ export const TodoForm = ({
   };
 
   const handleDelete = async () => {
-    await fetch(`http://localhost:3000/api/todo/${getValues("id")}`, {
+    await fetch(`http://localhost:3000/api/todo/${targetTodoId}`, {
       method: 'DELETE',
     });
 
@@ -78,7 +80,7 @@ export const TodoForm = ({
               <label className={clsx('form-label', styles.labelName)}>
                 タイトル
               </label>
-              <input type="text" {...register('title')}></input>
+              <input type="text" {...register('title', {required: true})}></input>
             </div>
 
             <div className={clsx(styles.formItem)}>
@@ -87,7 +89,7 @@ export const TodoForm = ({
               </label>
               <select
                   className="form-select"
-                  {...register('status')}
+                  {...register('status', {required: true})}
                   defaultValue="0"
               >
                 {statusList.map((status) => (
@@ -104,7 +106,7 @@ export const TodoForm = ({
               </label>
               <select
                   className="form-select"
-                  {...register('assignment')}
+                  {...register('assignment', {required: true})}
                   defaultValue="0"
               >
                 {memberList.map((member) => (
