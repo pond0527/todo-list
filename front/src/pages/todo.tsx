@@ -18,6 +18,7 @@ import Link from 'next/link';
 import { createTodoId, getTodoList } from 'lib/clients/todoClient';
 import { getMemberList } from 'lib/clients/memberClient';
 import { getStatusList } from 'lib/clients/statusClient';
+import { format } from 'date-fns';
 
 type Props = {
     memberList: Member[];
@@ -99,38 +100,49 @@ const TodoList = ({ memberList, statusList }: Props) => {
                     {todoList
                         .sort((o) => o.id)
                         .reverse()
-                        .map((todo) => (
-                            <tr
-                                key={todo.id}
-                                className={clsx(
-                                    styles.dataRow,
-                                    todo.status === '4' && styles.done,
-                                    todo.status === '3' && styles.warn,
-                                )}
-                            >
-                                <td>
-                                    <Link href={`/todo/${todo.id}`}>
-                                        {todo.title}
-                                    </Link>
-                                </td>
-                                <td>
-                                    {statusList.find(
-                                        (o) => o.id === todo.status,
-                                    )?.label || '-'}
-                                </td>
-                                <td>{todo.detail}</td>
-                                <td>
-                                    {memberList.find(
-                                        (o) => o.id === todo.assignment,
-                                    )?.name || '-'}
-                                </td>
-                                <td>{todo.createAt.toLocaleString('ja-JP')}</td>
-                                <td>
-                                    {todo.updateAt?.toLocaleString('ja-JP') ||
-                                        '-'}
-                                </td>
-                            </tr>
-                        ))}
+                        .map((todo) => {
+                            return (
+                                <tr
+                                    key={todo.id}
+                                    className={clsx(
+                                        styles.dataRow,
+                                        todo.status === '4' && styles.done,
+                                        todo.status === '3' && styles.warn,
+                                    )}
+                                >
+                                    <td>
+                                        <Link href={`/todo/${todo.id}`}>
+                                            {todo.title}
+                                        </Link>
+                                    </td>
+                                    <td>
+                                        {statusList.find(
+                                            (o) => o.id === todo.status,
+                                        )?.label || '-'}
+                                    </td>
+                                    <td>{todo.detail}</td>
+                                    <td>
+                                        {memberList.find(
+                                            (o) => o.id === todo.assignment,
+                                        )?.name || '-'}
+                                    </td>
+                                    <td>
+                                        {format(
+                                            todo.createAt,
+                                            'yyyy-MM-dd HH:mm',
+                                        )}
+                                    </td>
+                                    <td>
+                                        {todo.updateAt
+                                            ? format(
+                                                  todo.updateAt,
+                                                  'yyyy-MM-dd HH:mm',
+                                              )
+                                            : '-'}
+                                    </td>
+                                </tr>
+                            );
+                        })}
                 </tbody>
             </table>
 
