@@ -34,7 +34,7 @@ type Props = {
 const TodoList = ({ memberList, statusList }: Props) => {
     const router = useRouter();
     const [todoList, setTodoList] = useState<TodoListJsonData[]>([]);
-    const [filter, setFilter] = useState<TodoFilter>({showDone: false});
+    const [filter, setFilter] = useState<TodoFilter>({ showDone: false });
 
     useEffect(() => {
         if (!router.isReady) {
@@ -95,17 +95,20 @@ const TodoList = ({ memberList, statusList }: Props) => {
             <form className="form-inline-block">
                 {/* <h5>検索条件</h5> */}
                 <div className="form-check">
-                    <input 
-                        className="form-check-input" 
-                        type="checkbox" 
-                        checked={filter.showDone} 
-                        id="defaultCheck1" 
+                    <input
+                        className="form-check-input"
+                        type="checkbox"
+                        checked={filter.showDone}
+                        id="defaultCheck1"
                         onChange={(e) => {
-                            setFilter(prev => ({...prev, showDone: e.target.checked }))
+                            setFilter((prev) => ({
+                                ...prev,
+                                showDone: e.target.checked,
+                            }));
                         }}
                     />
                     <label className="form-check-label" htmlFor="defaultCheck1">
-                    完了済みのタスクも表示
+                        完了済みのタスクも表示
                     </label>
                 </div>
                 {/* <label className={clsx('my-2 mr-5')} htmlFor="statusSelectPref">
@@ -128,88 +131,92 @@ const TodoList = ({ memberList, statusList }: Props) => {
                     ))}
                 </select> */}
             </form>
-            <table className={clsx('table table-hover', styles.table)}>
-                <thead className={'table-light'}>
-                    <tr>
-                        <th>タイトル</th>
-                        <th>ステータス</th>
-                        <th>内容</th>
-                        <th>担当者</th>
-                        <th>起票日</th>
-                        <th>更新日</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {todoList
-                        .filter((o) => {
-                            // フィルター1
-                            if(!filter.showDone && o.status === '4') {
-                                return null;
-                            } else {
-                                return o;
-                            }
-                        })
-                        .filter((o) => {
-                            if(filter.status === undefined) {
-                                return o;
-                            }
-                            if(filter.status === o.status) {
-                                return o;
-                            }
-                        })
-                        .sort((o) => {
-                            return o.updateAt
-                                ? o.updateAt.getTime()
-                                : o.createAt.getTime();
-                        })
-                        .reverse()
-                        .map((todo) => {
-                            return (
-                                <tr
-                                    key={todo.id}
-                                    className={clsx(
-                                        styles.dataRow,
-                                        todo.status === '4' && styles.done,
-                                        todo.status === '3' && styles.warn,
-                                    )}
-                                >
-                                    <td className={'text-wrap'}>
-                                        <Link href={`/todo/${todo.id}`}>
-                                            {todo.title}
-                                        </Link>
-                                    </td>
-                                    <td>
-                                        {statusList.find(
-                                            (o) => o.id === todo.status,
-                                        )?.label || '-'}
-                                    </td>
-                                    <td className={'text-truncate'}>
-                                        {todo.detail}
-                                    </td>
-                                    <td>
-                                        {memberList.find(
-                                            (o) => o.id === todo.assignment,
-                                        )?.name || '-'}
-                                    </td>
-                                    <td>
-                                        {format(
-                                            todo.createAt,
-                                            'yyyy-MM-dd HH:mm',
+
+            <div>
+                <div className='fw-bold mb-3'>全{todoList.length}件</div>
+                <table className={clsx('table table-hover', styles.table)}>
+                    <thead className={'table-light'}>
+                        <tr>
+                            <th>タイトル</th>
+                            <th>ステータス</th>
+                            <th>内容</th>
+                            <th>担当者</th>
+                            <th>起票日</th>
+                            <th>更新日</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {todoList
+                            .filter((o) => {
+                                // フィルター1
+                                if (!filter.showDone && o.status === '4') {
+                                    return null;
+                                } else {
+                                    return o;
+                                }
+                            })
+                            .filter((o) => {
+                                if (filter.status === undefined) {
+                                    return o;
+                                }
+                                if (filter.status === o.status) {
+                                    return o;
+                                }
+                            })
+                            .sort((o) => {
+                                return o.updateAt
+                                    ? o.updateAt.getTime()
+                                    : o.createAt.getTime();
+                            })
+                            .reverse()
+                            .map((todo) => {
+                                return (
+                                    <tr
+                                        key={todo.id}
+                                        className={clsx(
+                                            styles.dataRow,
+                                            todo.status === '4' && styles.done,
+                                            todo.status === '3' && styles.warn,
                                         )}
-                                    </td>
-                                    <td>
-                                        {todo.updateAt
-                                            ? format(
-                                                  todo.updateAt,
-                                                  'yyyy-MM-dd HH:mm',
-                                              )
-                                            : '-'}
-                                    </td>
-                                </tr>
-                            );
-                        })}
-                </tbody>
-            </table>
+                                    >
+                                        <td className={'text-wrap'}>
+                                            <Link href={`/todo/${todo.id}`}>
+                                                {todo.title}
+                                            </Link>
+                                        </td>
+                                        <td>
+                                            {statusList.find(
+                                                (o) => o.id === todo.status,
+                                            )?.label || '-'}
+                                        </td>
+                                        <td className={'text-truncate'}>
+                                            {todo.detail}
+                                        </td>
+                                        <td>
+                                            {memberList.find(
+                                                (o) => o.id === todo.assignment,
+                                            )?.name || '-'}
+                                        </td>
+                                        <td>
+                                            {format(
+                                                todo.createAt,
+                                                'yyyy-MM-dd HH:mm',
+                                            )}
+                                        </td>
+                                        <td>
+                                            {todo.updateAt
+                                                ? format(
+                                                      todo.updateAt,
+                                                      'yyyy-MM-dd HH:mm',
+                                                  )
+                                                : '-'}
+                                        </td>
+                                    </tr>
+                                );
+                            })}
+                    </tbody>
+                </table>
+            </div>
 
             <FormProvider {...useFormMethods}>
                 <ReactModal
