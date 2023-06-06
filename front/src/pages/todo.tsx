@@ -20,6 +20,12 @@ import { getMemberList } from 'lib/clients/memberClient';
 import { getStatusList } from 'lib/clients/statusClient';
 import { format } from 'date-fns';
 
+type TodoFilter = Partial<
+    Pick<TodoListJsonData, 'title' | 'status' | 'assignment'>
+> & {
+    showDone: boolean;
+};
+
 type Props = {
     memberList: Member[];
     statusList: Status[];
@@ -28,6 +34,7 @@ type Props = {
 const TodoList = ({ memberList, statusList }: Props) => {
     const router = useRouter();
     const [todoList, setTodoList] = useState<TodoListJsonData[]>([]);
+    const [filter, setFilter] = useState<TodoFilter>({showDone: false});
 
     useEffect(() => {
         if (!router.isReady) {
@@ -85,6 +92,42 @@ const TodoList = ({ memberList, statusList }: Props) => {
                 </>
             }
         >
+            <form className="form-inline-block">
+                {/* <h5>検索条件</h5> */}
+                <div className="form-check">
+                    <input 
+                        className="form-check-input" 
+                        type="checkbox" 
+                        checked={filter.showDone} 
+                        id="defaultCheck1" 
+                        onChange={(e) => {
+                            setFilter(prev => ({...prev, showDone: e.target.checked }))
+                        }}
+                    />
+                    <label className="form-check-label" htmlFor="defaultCheck1">
+                    完了済みのタスクも表示
+                    </label>
+                </div>
+                {/* <label className={clsx('my-2 mr-5')} htmlFor="statusSelectPref">
+                    完了済みのタスクも表示
+                </label>
+                <select
+                    id="statusSelectPref"
+                    className="custom-select my-2 mr-5"
+                    value={filter.status}
+                    onChange={(e) => {
+                        const value = e.target.value === '' ? undefined:e.target.value;
+                        setFilter(prev => ({...prev, status: value }))
+                    }}
+                >
+                    <option value={undefined} />
+                    {statusList.map((status) => (
+                        <option key={status.id} value={status.id}>
+                            {status.label}
+                        </option>
+                    ))}
+                </select> */}
+            </form>
             <table className={clsx('table table-hover', styles.table)}>
                 <thead className={'table-light'}>
                     <tr>
@@ -98,6 +141,22 @@ const TodoList = ({ memberList, statusList }: Props) => {
                 </thead>
                 <tbody>
                     {todoList
+                        .filter((o) => {
+                            // フィルター1
+                            if(!filter.showDone && o.status === '4') {
+                                return null;
+                            } else {
+                                return o;
+                            }
+                        })
+                        .filter((o) => {
+                            if(filter.status === undefined) {
+                                return o;
+                            }
+                            if(filter.status === o.status) {
+                                return o;
+                            }
+                        })
                         .sort((o) => {
                             return o.updateAt
                                 ? o.updateAt.getTime()
