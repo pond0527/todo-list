@@ -1,0 +1,5 @@
+FROM mysql:8
+
+ENV MYSQL_DATABASE=todo
+ENV MYSQL_USER=todo
+

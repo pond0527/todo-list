@@ -206,9 +206,9 @@ const TodoList = ({ memberList, statusList }: Props) => {
                                         <td>
                                             {todo.updateAt
                                                 ? format(
-                                                      todo.updateAt,
-                                                      'yyyy-MM-dd HH:mm',
-                                                  )
+                                                    todo.updateAt,
+                                                    'yyyy-MM-dd HH:mm',
+                                                )
                                                 : '-'}
                                         </td>
                                     </tr>
