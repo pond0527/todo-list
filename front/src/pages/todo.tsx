@@ -15,10 +15,11 @@ import { TodoForm } from 'components/Todo';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { createTodoId, getTodoList } from 'lib/clients/todoClient';
+import { getTodoList } from 'lib/clients/todoClient';
 import { getMemberList } from 'lib/clients/memberClient';
 import { getStatusList } from 'lib/clients/statusClient';
 import { format } from 'date-fns';
+import { ulid } from 'ulid';
 
 type TodoFilter = Partial<
     Pick<TodoListJsonData, 'title' | 'status' | 'assignment'>
@@ -44,6 +45,7 @@ const TodoList = ({ memberList, statusList }: Props) => {
         (async () => {
             const todoList = await getTodoList();
             setTodoList(todoList);
+            console.log("todoList, ", todoList);
         })();
     }, [router.isReady]);
 
@@ -52,10 +54,8 @@ const TodoList = ({ memberList, statusList }: Props) => {
 
     const useFormMethods = useForm<TodoFormType>();
 
-    const handleClickCreate = useCallback(async () => {
-        const newTodoId = await createTodoId();
+    const handleClickCreate = useCallback(() => {
         useFormMethods.reset({
-            id: newTodoId,
             title: '',
             status: '0',
             assignment: '0',
@@ -172,7 +172,7 @@ const TodoList = ({ memberList, statusList }: Props) => {
                             .map((todo) => {
                                 return (
                                     <tr
-                                        key={todo.id}
+                                        key={todo.todoId}
                                         className={clsx(
                                             styles.dataRow,
                                             todo.status === '4' && styles.done,
@@ -180,7 +180,7 @@ const TodoList = ({ memberList, statusList }: Props) => {
                                         )}
                                     >
                                         <td className={'text-wrap'}>
-                                            <Link href={`/todo/${todo.id}`}>
+                                            <Link href={`/todo/${todo.todoId}`}>
                                                 {todo.title}
                                             </Link>
                                         </td>

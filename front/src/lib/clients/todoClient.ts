@@ -10,10 +10,12 @@ export const getTodoList = async (): Promise<TodoListJsonData[]> => {
         TodoListJsonData[]
     >;
 
+    console.log('responseBody', responseBody);
+
     return parsedTodoList(responseBody.data);
 };
 
-export const getTodo = async (todoId: number): Promise<TodoListJsonData> => {
+export const getTodo = async (todoId: string): Promise<TodoListJsonData> => {
     const response = await fetch(`http://localhost:3000/api/todo/${todoId}`, {
         method: 'GET',
     });
@@ -24,20 +26,11 @@ export const getTodo = async (todoId: number): Promise<TodoListJsonData> => {
     return parsedTodo(responseBody.data);
 };
 
-export const createTodoId = async (): Promise<number> => {
-    const response = await fetch(`http://localhost:3000/api/todo/id-sequence`, {
-        method: 'POST',
-    });
-
-    const responseBody = (await response.json()) as ApiResoinse<number>;
-
-    return responseBody.data;
-};
-
 const parsedTodoList = (todoList: TodoListJsonData[]) =>
     todoList.map(parsedTodo);
 
 const parsedTodo = (todo: TodoListJsonData) => {
+    // const parsedTodo = { ...todo };
     const parsedTodo = { ...todo, createAt: new Date(todo.createAt) };
     if (todo.updateAt) {
         parsedTodo.updateAt = new Date(todo.updateAt);

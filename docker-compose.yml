@@ -20,7 +20,7 @@ services:
       - 13306:3306
     command: --default-authentication-plugin=mysql_native_password
     volumes:
-      - ./database/my.cnf:/etc/mysql/conf.d/my.cnf
+      - ./database/my.conf:/etc/mysql/conf.d/my.conf
       - ./database/init:/docker-entrypoint-initdb.d
     env_file:
       - database/.password.env

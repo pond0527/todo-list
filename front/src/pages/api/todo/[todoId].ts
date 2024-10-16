@@ -1,71 +1,110 @@
 import { TodoListJsonData, TodoFormType } from 'types/todo/type.d';
 import { ApiResoinse } from 'types/api/type.d';
 import { NextApiRequest, NextApiResponse } from 'next';
-import * as fs from 'node:fs/promises';
-import { TODO_LIST_FILEPATH, getTodoList } from '../todo';
-
+import { Todo } from 'types/mysql/type';
+import todoRepository from 'ports/todo-repository';
+import { ulid } from 'ulid';
+import { format } from 'date-fns';
+import logger from 'lib/logger';
 
 const handler = async (
     req: NextApiRequest,
-    res: NextApiResponse<ApiResoinse<boolean|TodoListJsonData>>,
+    res: NextApiResponse<ApiResoinse<boolean | TodoListJsonData>>,
 ) => {
     console.log(req.query, req.body);
+
     const { todoId } = req.query;
+
     if (req.method === 'POST') {
-        const result = await upsertTodo(
-            Number(todoId),
-            JSON.parse(req.body) as TodoFormType,
-        );
-        res.status(200).json({ data: result });
-    } else if (req.method === 'GET') {
-        const todoList = await getTodoList();
-        const todo = todoList.find((o) => o.id === Number(todoId));
-        if(todo) {
-            res.status(200).json({data: todo});
+        const form = JSON.parse(req.body) as TodoFormType;
+
+        const registData = {
+            todo_id: ulid(),
+            name: form.title,
+            detail: form.detail,
+            assign_member_id: form.assignment,
+            toto_status: form.status,
+            is_warning: form.status === 'Warn',
+            created_at: format(new Date(), 'yyyy-MM-dd HH-mm-ss'),
+            updated_at: format(new Date(), 'yyyy-MM-dd HH-mm-ss'),
+        } as Todo;
+
+        const isSuccess = await todoRepository.register(registData);
+        if (isSuccess) {
+            res.status(200).json({
+                data: {
+                    todoId: registData.todo_id,
+                    title: registData.name,
+                    status: registData.toto_status,
+                    assignment: registData.assign_member_id,
+                    detail: registData.detail,
+                    createAt: new Date(registData.created_at),
+                    updateAt: new Date(registData.updated_at),
+                } as TodoListJsonData,
+            });
         } else {
+            res.status(200).json({ data: false });
+        }
+    } else if (req.method === 'PUT') {
+        if (todoId == null) {
+            logger.warn('required totoId');
             res.status(400);
+            return;
+        }
+
+        const form = JSON.parse(req.body) as TodoFormType;
+
+        // シングルユーザーしかサポートしてないので競合は考慮しない
+        const updateData = {
+            todo_id: todoId,
+            name: form.title,
+            detail: form.detail,
+            assign_member_id: form.assignment,
+            toto_status: form.status,
+            is_warning: form.status === 'Warn',
+            updated_at: format(new Date(), 'yyyy-MM-dd HH-mm-ss'),
+        } as Todo;
+
+        const isSuccess = await todoRepository.update(updateData);
+        res.status(200).json({ data: isSuccess });
+    } else if (req.method === 'GET') {
+        if (todoId == null) {
+            logger.warn('required totoId');
+            res.status(400);
+            return;
+        }
+
+        const todo: Todo | undefined = await todoRepository.fetchBy(
+            String(todoId),
+        );
+        if (todo) {
+            res.status(200).json({
+                data: {
+                    todoId: todo.todo_id,
+                    title: todo.name,
+                    status: todo.toto_status,
+                    assignment: todo.assign_member_id,
+                    detail: todo.detail,
+                    createAt: new Date(todo.created_at),
+                    updateAt: new Date(todo.updated_at),
+                },
+            });
+        } else {
+            logger.warn(`not found, todoId=${todoId}`);
+            res.status(404);
         }
     } else if (req.method === 'DELETE') {
-        const result = await deleteTodo(Number(todoId));
-        res.status(200).json({ data: result });
+        if (todoId == null) {
+            logger.warn('required totoId');
+            res.status(400);
+            return;
+        }
+
+        const isSuccess = await todoRepository.deleteBy(todoId.toString());
+        res.status(200).json({ data: isSuccess });
     } else {
         res.status(403);
     }
 };
-
-const upsertTodo = async (todoId: number, todoForm: TodoFormType) => {
-    const todoList = await getTodoList();
-    const matchedTargetTodo = todoList.find((o) => o.id === todoId);
-    let todo: TodoListJsonData;
-    if (matchedTargetTodo) {
-        // 存在するデータは上書きするので警告しておく
-        console.warn(`${todoId} is conflict to override`);
-        todo = { ...matchedTargetTodo, ...todoForm, updateAt: new Date() };
-    } else {
-        todo = { ...todoForm, id: todoId, createAt: new Date() };
-    }
-
-    const updateTodoList: TodoListJsonData[] = todoList
-        .filter((o) => o.id !== todoId)
-        .concat([todo]);
-
-    return save(updateTodoList);
-};
-
-const deleteTodo = async (todoId: number) => {
-    const todoList = await getTodoList();
-    return save(todoList.filter((o) => o.id !== todoId));
-};
-
-const save = (todoList: TodoListJsonData[]): boolean => {
-    try {
-        fs.writeFile(TODO_LIST_FILEPATH, JSON.stringify(todoList));
-        return true;
-    } catch (e: any) {
-        console.log(e);
-        return false;
-    }
-};
-
 
 export default handler;

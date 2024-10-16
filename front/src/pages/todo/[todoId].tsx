@@ -28,7 +28,7 @@ const EditTodo = ({ memberList, statusList }: Props) => {
         }
 
         (async () => {
-            const todo = await getTodo(Number(todoId));
+            const todo = await getTodo(String(todoId));
             useFormMethods.reset(todo);
         })();
     }, [router.isReady, todoId, useFormMethods]);

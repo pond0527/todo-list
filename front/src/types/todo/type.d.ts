@@ -1,25 +1,24 @@
 export type TodoFormType = Pick<
     TodoListJsonData,
-    'id' | 'title' | 'status' | 'assignment' | 'detail'
+    'todoId' | 'title' | 'status' | 'assignment' | 'detail'
 >;
 
 export type TodoListJsonData = {
-    id: number;
+    todoId?: string;
     title: string;
     status: string;
     assignment: string;
     detail: string;
     createAt: Date;
-    updateAt?: Date;
+    updateAt: Date;
 };
 
-
 export type Member = {
-    id: string,
-    name: string,
-}
+    id: string;
+    name: string;
+};
 
 export type Status = {
-    id: string,
-    label: string,
-}
+    id: string;
+    label: string;
+};

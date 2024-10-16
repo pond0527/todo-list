@@ -2,7 +2,8 @@ import { TodoListJsonData } from 'types/todo/type.d';
 import { ApiResoinse } from 'types/api/type.d';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { join } from 'path';
-import * as fs from 'node:fs/promises';
+import todoRepository from 'ports/todo-repository';
+import logger from 'lib/logger';
 
 export const TODO_LIST_FILEPATH = join(process.cwd(), 'share/todo-list.json');
 console.log(TODO_LIST_FILEPATH);
@@ -12,25 +13,26 @@ const handler = async (
     res: NextApiResponse<ApiResoinse<TodoListJsonData[]>>,
 ) => {
     if (req.method === 'GET') {
-        const todoList = await getTodoList();
-        console.log('Get: todoList, ', todoList);
-        JSON.stringify({ data: todoList });
-        res.status(200).send({ data: todoList });
+        const todoList = await todoRepository.fetchAll();
+
+        logger.info({ todoList: todoList }, 'Get: todoList');
+
+        res.status(200).send({
+            data: todoList.map(
+                (data) =>
+                    ({
+                        todoId: data.todo_id,
+                        title: data.name,
+                        status: data.toto_status,
+                        assignment: data.assign_member_id,
+                        detail: data.detail,
+                        createAt: data.created_at,
+                        updateAt: data.updated_at,
+                    } as TodoListJsonData),
+            ),
+        });
     } else {
         res.status(403);
-    }
-};
-
-export const getTodoList = async (): Promise<TodoListJsonData[]> => {
-    try {
-        const data = await fs.readFile(TODO_LIST_FILEPATH, {
-            encoding: 'utf-8',
-        });
-        const todoList = JSON.parse(data);
-
-        return Promise.resolve(todoList);
-    } catch (e: any) {
-        return Promise.resolve([]);
     }
 };
 
