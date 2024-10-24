@@ -1,4 +1,9 @@
-import { TodoListJsonData, TodoFormType } from 'types/todo/type.d';
+import {
+    TodoListJsonData,
+    TodoFormType,
+    TodoStatus,
+    TodoStatusType,
+} from 'types/todo/type.d';
 import { ApiResoinse } from 'types/api/type.d';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { Todo } from 'types/mysql/type';
@@ -6,6 +11,7 @@ import todoRepository from 'ports/todo-repository';
 import { ulid } from 'ulid';
 import { format } from 'date-fns';
 import logger from 'lib/logger';
+import { TODO_STATUS_LIST } from 'constants/todo/status';
 
 const handler = async (
     req: NextApiRequest,
@@ -24,7 +30,7 @@ const handler = async (
             detail: form.detail,
             assign_member_id: form.assignment,
             toto_status: form.status,
-            is_warning: form.status === 'Warn',
+            is_warning: form.isWarning,
             created_at: format(new Date(), 'yyyy-MM-dd HH-mm-ss'),
             updated_at: format(new Date(), 'yyyy-MM-dd HH-mm-ss'),
         } as Todo;
@@ -35,8 +41,11 @@ const handler = async (
                 data: {
                     todoId: registData.todo_id,
                     title: registData.name,
-                    status: registData.toto_status,
+
+                    status: (registData.toto_status ??
+                        TodoStatus.Open) as TodoStatusType,
                     assignment: registData.assign_member_id,
+                    isWarning: registData.is_warning,
                     detail: registData.detail,
                     createAt: new Date(registData.created_at),
                     updateAt: new Date(registData.updated_at),
@@ -61,7 +70,7 @@ const handler = async (
             detail: form.detail,
             assign_member_id: form.assignment,
             toto_status: form.status,
-            is_warning: form.status === 'Warn',
+            is_warning: form.isWarning,
             updated_at: format(new Date(), 'yyyy-MM-dd HH-mm-ss'),
         } as Todo;
 
@@ -77,17 +86,20 @@ const handler = async (
         const todo: Todo | undefined = await todoRepository.fetchBy(
             String(todoId),
         );
+
         if (todo) {
             res.status(200).json({
                 data: {
                     todoId: todo.todo_id,
                     title: todo.name,
-                    status: todo.toto_status,
+                    status: (todo.toto_status ??
+                        TodoStatus.Open) as TodoStatusType,
                     assignment: todo.assign_member_id,
+                    isWarning: todo.is_warning,
                     detail: todo.detail,
                     createAt: new Date(todo.created_at),
                     updateAt: new Date(todo.updated_at),
-                },
+                } as unknown as TodoListJsonData,
             });
         } else {
             logger.warn(`not found, todoId=${todoId}`);

@@ -18,6 +18,7 @@ const handler = async (
     if (req.method === 'GET') {
         const memberList = await getMemberList();
         logger.info({ memberList: memberList }, 'Get: memberList, ');
+
         JSON.stringify({ data: memberList });
         res.status(200).send({ data: memberList });
     } else {

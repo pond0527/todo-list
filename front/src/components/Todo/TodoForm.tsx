@@ -1,15 +1,16 @@
 import clsx from 'clsx';
 import styles from './todo.module.scss';
-import { Member, Status, TodoFormType } from 'types/todo/type.d';
+import { Member, TodoFormType, TodoStatus, TodoStatusType } from 'types/todo/type.d';
 import { useFormContext } from 'react-hook-form';
 import { Layout } from 'components/Layout';
+import { SelectOutput } from 'types/form';
 
 type Mode = 'new' | 'edit';
 
 type Props = {
   mode: Mode;
   memberList: Member[];
-  statusList: Status[];
+  statusList: SelectOutput[];
   onComplete?: VoidFunction;
   onBack?: VoidFunction;
 };
@@ -21,7 +22,7 @@ export const TodoForm = ({
   statusList,
   memberList,
 }: Props) => {
-  const { register, getValues } = useFormContext<TodoFormType>();
+  const { register, getValues, setValue } = useFormContext<TodoFormType>();
 
   const targetTodoId: string | undefined = getValues("todoId");
   console.log("targetTodoId: ", targetTodoId);
@@ -88,17 +89,35 @@ export const TodoForm = ({
             <label className={clsx('form-label', styles.labelName)}>
               ステータス
             </label>
-            <select
-              className="form-select"
-              {...register('status', { required: true })}
-              defaultValue="0"
-            >
-              {statusList.map((status) => (
-                <option key={status.id} value={status.id}>
-                  {status.label}
-                </option>
-              ))}
-            </select>
+
+            <div className="form-group">
+              <select
+                className="form-select"
+                {...register('status', { required: true })}
+                value={getValues('status')}
+                onChange={(e) => {
+                  setValue('status', statusList.find(o => o.value === e.target.value)?.value as TodoStatusType || TodoStatus.Open)
+                }}
+              >
+                {statusList.map((status) => (
+                  <option key={status.value} value={status.value} selected={status.value === getValues('status')} >
+                    {status.label}
+                  </option>
+                ))}
+              </select>
+
+              <div className="form-check">
+                <input
+                  id="isWarning"
+                  className="form-check-input"
+                  type="checkbox"
+                  {...register('isWarning')}
+                />
+                <label className="form-check-label" htmlFor="isWarning">
+                  警告
+                </label>
+              </div>
+            </div>
           </div>
 
           <div className={clsx(styles.formItem)}>

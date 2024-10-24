@@ -1,8 +1,8 @@
 import {
     Member,
-    Status,
     TodoFormType,
     TodoListJsonData,
+    TodoStatus,
 } from 'types/todo/type.d';
 import styles from 'components/Todo/todo.module.scss';
 import clsx from 'clsx';
@@ -17,9 +17,8 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { getTodoList } from 'lib/clients/todoClient';
 import { getMemberList } from 'lib/clients/memberClient';
-import { getStatusList } from 'lib/clients/statusClient';
 import { format } from 'date-fns';
-import { ulid } from 'ulid';
+import { TODO_STATUS_LIST } from 'constants/todo/status';
 
 type TodoFilter = Partial<
     Pick<TodoListJsonData, 'title' | 'status' | 'assignment'>
@@ -29,10 +28,9 @@ type TodoFilter = Partial<
 
 type Props = {
     memberList: Member[];
-    statusList: Status[];
 };
 
-const TodoList = ({ memberList, statusList }: Props) => {
+const TodoList = ({ memberList }: Props) => {
     const router = useRouter();
     const [todoList, setTodoList] = useState<TodoListJsonData[]>([]);
     const [filter, setFilter] = useState<TodoFilter>({ showDone: false });
@@ -57,7 +55,7 @@ const TodoList = ({ memberList, statusList }: Props) => {
     const handleClickCreate = useCallback(() => {
         useFormMethods.reset({
             title: '',
-            status: '0',
+            status: TodoStatus.Open,
             assignment: '0',
             detail: '',
         });
@@ -93,7 +91,6 @@ const TodoList = ({ memberList, statusList }: Props) => {
             }
         >
             <form className="form-inline-block">
-                {/* <h5>検索条件</h5> */}
                 <div className="form-check">
                     <input
                         className="form-check-input"
@@ -111,25 +108,6 @@ const TodoList = ({ memberList, statusList }: Props) => {
                         完了済みのタスクも表示
                     </label>
                 </div>
-                {/* <label className={clsx('my-2 mr-5')} htmlFor="statusSelectPref">
-                    完了済みのタスクも表示
-                </label>
-                <select
-                    id="statusSelectPref"
-                    className="custom-select my-2 mr-5"
-                    value={filter.status}
-                    onChange={(e) => {
-                        const value = e.target.value === '' ? undefined:e.target.value;
-                        setFilter(prev => ({...prev, status: value }))
-                    }}
-                >
-                    <option value={undefined} />
-                    {statusList.map((status) => (
-                        <option key={status.id} value={status.id}>
-                            {status.label}
-                        </option>
-                    ))}
-                </select> */}
             </form>
 
             <div>
@@ -149,7 +127,8 @@ const TodoList = ({ memberList, statusList }: Props) => {
                         {todoList
                             .filter((o) => {
                                 // フィルター1
-                                if (!filter.showDone && o.status === '4') {
+                                if (!filter.showDone && o.status === TodoStatus.Done) {
+                                    // 完了ステータスは非表示
                                     return null;
                                 } else {
                                     return o;
@@ -175,8 +154,8 @@ const TodoList = ({ memberList, statusList }: Props) => {
                                         key={todo.todoId}
                                         className={clsx(
                                             styles.dataRow,
-                                            todo.status === '4' && styles.done,
-                                            todo.status === '3' && styles.warn,
+                                            todo.status === TodoStatus.Done && styles.done,
+                                            todo.isWarning && styles.warn,
                                         )}
                                     >
                                         <td className={'text-wrap'}>
@@ -185,8 +164,8 @@ const TodoList = ({ memberList, statusList }: Props) => {
                                             </Link>
                                         </td>
                                         <td>
-                                            {statusList.find(
-                                                (o) => o.id === todo.status,
+                                            {TODO_STATUS_LIST.find(
+                                                (o) => o.value === todo.status,
                                             )?.label || '-'}
                                         </td>
                                         <td className={'text-truncate'}>
@@ -230,7 +209,7 @@ const TodoList = ({ memberList, statusList }: Props) => {
                     <TodoForm
                         mode={'new'}
                         memberList={memberList}
-                        statusList={statusList}
+                        statusList={TODO_STATUS_LIST}
                         onComplete={handleComplete}
                         onBack={handleBack}
                     />
@@ -247,11 +226,8 @@ export default TodoList;
 export const getServerSideProps = async (): Promise<
     GetServerSidePropsResult<Props>
 > => {
-    console.log('## start getServerSideProps');
     const memberList = await getMemberList();
-    const statusList = await getStatusList();
-    console.log('## end getServerSideProps');
     return {
-        props: { memberList, statusList },
+        props: { memberList },
     };
 };

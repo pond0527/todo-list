@@ -1,12 +1,22 @@
 export type TodoFormType = Pick<
     TodoListJsonData,
-    'todoId' | 'title' | 'status' | 'assignment' | 'detail'
+    'todoId' | 'title' | 'status' | 'assignment' | 'detail' | 'isWarning'
 >;
+
+export const TodoStatus = {
+    Open: 'Open',
+    Doing: 'Doing',
+    Pending: 'Pending',
+    Done: 'Done',
+} as const;
+
+export type TodoStatusType = keyof typeof TodoStatus;
 
 export type TodoListJsonData = {
     todoId?: string;
     title: string;
-    status: string;
+    status: TodoStatusType;
+    isWarning: boolean;
     assignment: string;
     detail: string;
     createAt: Date;
@@ -16,9 +26,4 @@ export type TodoListJsonData = {
 export type Member = {
     id: string;
     name: string;
-};
-
-export type Status = {
-    id: string;
-    label: string;
 };

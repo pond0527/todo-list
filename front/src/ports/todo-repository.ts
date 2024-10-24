@@ -53,10 +53,10 @@ const TodoRepositoryImpl = (pool: Pool): TodoRepository => {
         try {
             const con = await pool.getConnection();
             await con.query(
-                'update todo set name = :name, detail = :detail, assign_member_id = :assign_member_id, toto_status = :toto_status, is_warning = :is_warning, created_at = :created_at, updated_at = :updated_at where todo_id = :todo_id',
+                'update todo set name = :name, detail = :detail, assign_member_id = :assign_member_id, toto_status = :toto_status, is_warning = :is_warning, updated_at = :updated_at where todo_id = :todo_id',
                 { ...todo },
             );
-            return false;
+            return true;
         } catch (e: any) {
             logger.error(e);
             return false;
@@ -67,12 +67,9 @@ const TodoRepositoryImpl = (pool: Pool): TodoRepository => {
         try {
             const con = await pool.getConnection();
 
-            await con.query(
-                'update todo set is_deleted = true where todo_id = :todo_id',
-                {
-                    todo_id: todoId,
-                },
-            );
+            await con.query('delete from todo where todo_id = :todo_id', {
+                todo_id: todoId,
+            });
 
             return true;
         } catch (e: any) {

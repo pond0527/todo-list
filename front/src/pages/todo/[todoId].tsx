@@ -1,6 +1,6 @@
 import { TodoForm } from 'components/Todo';
+import { TODO_STATUS_LIST } from 'constants/todo/status';
 import { getMemberList } from 'lib/clients/memberClient';
-import { getStatusList } from 'lib/clients/statusClient';
 import { getTodo } from 'lib/clients/todoClient';
 import { GetServerSidePropsResult } from 'next';
 import { useRouter } from 'next/router';
@@ -8,16 +8,14 @@ import { useLayoutEffect } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import {
     Member,
-    Status,
     TodoFormType,
 } from 'types/todo/type';
 
 type Props = {
     memberList: Member[];
-    statusList: Status[];
 };
 
-const EditTodo = ({ memberList, statusList }: Props) => {
+const EditTodo = ({ memberList }: Props) => {
     const router = useRouter();
     const { todoId } = router.query;
     const useFormMethods = useForm<TodoFormType>();
@@ -29,7 +27,8 @@ const EditTodo = ({ memberList, statusList }: Props) => {
 
         (async () => {
             const todo = await getTodo(String(todoId));
-            useFormMethods.reset(todo);
+            useFormMethods.reset({ ...todo });
+            console.log(todoId, todo);
         })();
     }, [router.isReady, todoId, useFormMethods]);
 
@@ -39,7 +38,7 @@ const EditTodo = ({ memberList, statusList }: Props) => {
             <TodoForm
                 mode={'edit'}
                 memberList={memberList}
-                statusList={statusList}
+                statusList={TODO_STATUS_LIST}
                 onComplete={() => router.push('/todo')}
                 onBack={() => router.back()}
             />
@@ -53,9 +52,8 @@ export const getServerSideProps = async (
     context: any,
 ): Promise<GetServerSidePropsResult<Props>> => {
     const memberList = await getMemberList();
-    const statusList = await getStatusList();
 
     return {
-        props: { memberList, statusList },
+        props: { memberList },
     };
 };
