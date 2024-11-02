@@ -129,7 +129,7 @@ export const TodoForm = ({
             </label>
             <select
               className="form-select"
-              {...register('assignment', { required: true })}
+              {...register('assignmentMemberId', { required: true })}
               defaultValue="0"
             >
               {memberList.map((member) => (

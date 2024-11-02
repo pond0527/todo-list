@@ -21,7 +21,7 @@ import { format } from 'date-fns';
 import { TODO_STATUS_LIST } from 'constants/todo/status';
 
 type TodoFilter = Partial<
-    Pick<TodoListJsonData, 'title' | 'status' | 'assignment'>
+    Pick<TodoListJsonData, 'title' | 'status' | 'assignmentMemberId'>
 > & {
     showDone: boolean;
 };
@@ -56,7 +56,7 @@ const TodoList = ({ memberList }: Props) => {
         useFormMethods.reset({
             title: '',
             status: TodoStatus.Open,
-            assignment: '0',
+            assignmentMemberId: '0',
             detail: '',
         });
 
@@ -173,7 +173,7 @@ const TodoList = ({ memberList }: Props) => {
                                         </td>
                                         <td>
                                             {memberList.find(
-                                                (o) => o.memberId === todo.assignment,
+                                                (o) => o.memberId === todo.assignmentMemberId,
                                             )?.name || '-'}
                                         </td>
                                         <td>

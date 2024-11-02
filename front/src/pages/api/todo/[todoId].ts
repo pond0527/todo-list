@@ -27,7 +27,7 @@ const handler = async (
             todo_id: ulid(),
             name: form.title,
             detail: form.detail,
-            assign_member_id: form.assignment,
+            assign_member_id: form.assignmentMemberId,
             toto_status: form.status,
             is_warning: form.isWarning,
             created_at: format(new Date(), 'yyyy-MM-dd HH-mm-ss'),
@@ -43,7 +43,7 @@ const handler = async (
 
                     status: (registData.toto_status ??
                         TodoStatus.Open) as TodoStatusType,
-                    assignment: registData.assign_member_id,
+                    assignmentMemberId: registData.assign_member_id,
                     isWarning: registData.is_warning,
                     detail: registData.detail,
                     createAt: new Date(registData.created_at),
@@ -67,7 +67,7 @@ const handler = async (
             todo_id: todoId,
             name: form.title,
             detail: form.detail,
-            assign_member_id: form.assignment,
+            assign_member_id: form.assignmentMemberId,
             toto_status: form.status,
             is_warning: form.isWarning,
             updated_at: format(new Date(), 'yyyy-MM-dd HH-mm-ss'),
@@ -93,7 +93,7 @@ const handler = async (
                     title: todo.name,
                     status: (todo.toto_status ??
                         TodoStatus.Open) as TodoStatusType,
-                    assignment: todo.assign_member_id,
+                    assignmentMemberId: todo.assign_member_id,
                     isWarning: todo.is_warning,
                     detail: todo.detail,
                     createAt: new Date(todo.created_at),

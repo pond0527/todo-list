@@ -20,7 +20,7 @@ const handler = async (
                             todoId: data.todo_id,
                             title: data.name,
                             status: data.toto_status,
-                            assignment: data.assign_member_id,
+                            assignmentMemberId: data.assign_member_id,
                             isWarning: data.is_warning,
                             detail: data.detail,
                             createAt: data.created_at,
