@@ -11,7 +11,6 @@ import todoRepository from 'ports/todo-repository';
 import { ulid } from 'ulid';
 import { format } from 'date-fns';
 import logger from 'lib/logger';
-import { TODO_STATUS_LIST } from 'constants/todo/status';
 
 const handler = async (
     req: NextApiRequest,

@@ -23,7 +23,7 @@ export type TodoListJsonData = {
     updateAt: Date;
 };
 
-export type Member = {
-    id: string;
+export type MemberApiData = {
+    memberId: string;
     name: string;
 };

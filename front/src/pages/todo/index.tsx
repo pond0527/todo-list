@@ -1,5 +1,5 @@
 import {
-    Member,
+    MemberApiData,
     TodoFormType,
     TodoListJsonData,
     TodoStatus,
@@ -27,7 +27,7 @@ type TodoFilter = Partial<
 };
 
 type Props = {
-    memberList: Member[];
+    memberList: MemberApiData[];
 };
 
 const TodoList = ({ memberList }: Props) => {
@@ -71,8 +71,8 @@ const TodoList = ({ memberList }: Props) => {
         // リストを最新化
         const todoList = await getTodoList();
         setTodoList(todoList);
-
         setIsOpenFormModal(false);
+
         toast.success('保存しました。');
     }, [toast]);
 
@@ -173,7 +173,7 @@ const TodoList = ({ memberList }: Props) => {
                                         </td>
                                         <td>
                                             {memberList.find(
-                                                (o) => o.id === todo.assignment,
+                                                (o) => o.memberId === todo.assignment,
                                             )?.name || '-'}
                                         </td>
                                         <td>
@@ -197,15 +197,15 @@ const TodoList = ({ memberList }: Props) => {
                 </table>
             </div>
 
-            <FormProvider {...useFormMethods}>
-                <ReactModal
-                    isOpen={isOpenFormModal}
-                    overlayClassName="overlay"
-                    ariaHideApp={false}
-                    onRequestClose={() => {
-                        setIsOpenFormModal(false);
-                    }}
-                >
+            <ReactModal
+                isOpen={isOpenFormModal}
+                overlayClassName="overlay"
+                ariaHideApp={false}
+                onRequestClose={() => {
+                    setIsOpenFormModal(false);
+                }}
+            >
+                <FormProvider {...useFormMethods}>
                     <TodoForm
                         mode={'new'}
                         memberList={memberList}
@@ -213,9 +213,8 @@ const TodoList = ({ memberList }: Props) => {
                         onComplete={handleComplete}
                         onBack={handleBack}
                     />
-                </ReactModal>
-            </FormProvider>
-
+                </FormProvider>
+            </ReactModal>
             <Toaster />
         </Layout>
     );

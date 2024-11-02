@@ -7,12 +7,12 @@ import { useRouter } from 'next/router';
 import { useLayoutEffect } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import {
-    Member,
+    MemberApiData,
     TodoFormType,
 } from 'types/todo/type';
 
 type Props = {
-    memberList: Member[];
+    memberList: MemberApiData[];
 };
 
 const EditTodo = ({ memberList }: Props) => {

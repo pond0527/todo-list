@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import styles from './todo.module.scss';
-import { Member, TodoFormType, TodoStatus, TodoStatusType } from 'types/todo/type.d';
+import { MemberApiData, TodoFormType, TodoStatus, TodoStatusType } from 'types/todo/type.d';
 import { useFormContext } from 'react-hook-form';
 import { Layout } from 'components/Layout';
 import { SelectOutput } from 'types/form';
@@ -9,7 +9,7 @@ type Mode = 'new' | 'edit';
 
 type Props = {
   mode: Mode;
-  memberList: Member[];
+  memberList: MemberApiData[];
   statusList: SelectOutput[];
   onComplete?: VoidFunction;
   onBack?: VoidFunction;
@@ -94,13 +94,16 @@ export const TodoForm = ({
               <select
                 className="form-select"
                 {...register('status', { required: true })}
-                value={getValues('status')}
+                defaultValue={getValues('status')}
                 onChange={(e) => {
                   setValue('status', statusList.find(o => o.value === e.target.value)?.value as TodoStatusType || TodoStatus.Open)
                 }}
               >
                 {statusList.map((status) => (
-                  <option key={status.value} value={status.value} selected={status.value === getValues('status')} >
+                  <option
+                    key={status.value}
+                    value={status.value}
+                  >
                     {status.label}
                   </option>
                 ))}
@@ -130,7 +133,7 @@ export const TodoForm = ({
               defaultValue="0"
             >
               {memberList.map((member) => (
-                <option key={member.id} value={member.id}>
+                <option key={member.memberId} value={member.memberId}>
                   {member.name}
                 </option>
               ))}
