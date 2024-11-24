@@ -1,0 +1,28 @@
+version: "3"
+
+services:
+  todo-list-app:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile.front
+    volumes:
+      - ./front/share:/app/share
+    ports:
+      - "127.0.0.1:3000:3000"
+    depends_on:
+      - mysql
+  mysql:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile.db
+    # container_name: mysql
+    ports:
+      - 13306:3306
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - ./database/my.conf:/etc/mysql/conf.d/my.conf
+      - ./database/init:/docker-entrypoint-initdb.d
+    env_file:
+      - database/.password.env
+    cap_add:
+      - SYS_NICE
