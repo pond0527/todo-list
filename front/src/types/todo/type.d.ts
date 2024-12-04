@@ -26,4 +26,7 @@ export type TodoListJsonData = {
 export type MemberApiData = {
     memberId: string;
     name: string;
+    isDeleted: boolean;
 };
+
+export type MemberFormType = MemberApiData;

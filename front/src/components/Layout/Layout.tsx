@@ -1,8 +1,9 @@
 import clsx from 'clsx';
-import styles from './Styles.module.scss';
-import { ReactNode, useEffect } from 'react';
 import { PageHeader } from 'components/PageHeader';
+import Link from 'next/link';
+import { ReactNode, useEffect } from 'react';
 import { useToast } from '../../lib/toast';
+import styles from './Styles.module.scss';
 
 type Props = {
     pageTitle: string;
@@ -18,10 +19,18 @@ export const Layout = ({ pageTitle, rightItems, children }: Props) => {
     const { Toaster } = useToast();
 
     return (
-        <div className={clsx('container-xl container-sm', styles.container)}>
-            <PageHeader title={pageTitle} rightItems={rightItems} />
-            {children}
-            <Toaster />
-        </div>
+        <>
+            <div>
+                <Link href="/">トップへ</Link>
+            </div>
+
+            <div
+                className={clsx('container-xl container-sm', styles.container)}
+            >
+                <PageHeader title={pageTitle} rightItems={rightItems} />
+                {children}
+                <Toaster />
+            </div>
+        </>
     );
 };
