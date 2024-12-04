@@ -2,7 +2,6 @@ import {
     MemberApiData,
     TodoFormType,
     TodoListJsonData,
-    TodoStatus,
 } from 'types/todo/type.d';
 import styles from 'components/Todo/todo.module.scss';
 import clsx from 'clsx';
@@ -18,7 +17,7 @@ import Link from 'next/link';
 import { getTodoList } from 'lib/clients/todoClient';
 import { getMemberList } from 'lib/clients/memberClient';
 import { format } from 'date-fns';
-import { TODO_STATUS_LIST } from 'constants/todo/status';
+import { TODO_STATUS_LIST, TodoStatus } from 'constants/todo/status';
 
 type TodoFilter = Partial<
     Pick<TodoListJsonData, 'title' | 'status' | 'assignmentMemberId'>

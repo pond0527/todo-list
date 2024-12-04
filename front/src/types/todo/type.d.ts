@@ -1,3 +1,5 @@
+import { TodoStatus } from 'constants/todo/status';
+
 export type TodoFormType = Pick<
     TodoListJsonData,
     | 'todoId'
@@ -7,13 +9,6 @@ export type TodoFormType = Pick<
     | 'detail'
     | 'isWarning'
 >;
-
-export const TodoStatus = {
-    Open: 'Open',
-    Doing: 'Doing',
-    Pending: 'Pending',
-    Done: 'Done',
-} as const;
 
 export type TodoStatusType = keyof typeof TodoStatus;
 

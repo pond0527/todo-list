@@ -1,9 +1,10 @@
 import clsx from 'clsx';
 import styles from './todo.module.scss';
-import { MemberApiData, TodoFormType, TodoStatus, TodoStatusType } from 'types/todo/type.d';
+import { MemberApiData, TodoFormType, TodoStatusType } from 'types/todo/type.d';
 import { useFormContext } from 'react-hook-form';
 import { Layout } from 'components/Layout';
 import { SelectOutput } from 'types/form';
+import { TodoStatus } from 'constants/todo/status';
 
 type Mode = 'new' | 'edit';
 

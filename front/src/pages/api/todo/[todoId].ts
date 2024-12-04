@@ -1,7 +1,6 @@
 import {
     TodoListJsonData,
     TodoFormType,
-    TodoStatus,
     TodoStatusType,
 } from 'types/todo/type.d';
 import { ApiResoinse } from 'types/api/type.d';
@@ -11,6 +10,7 @@ import todoRepository from 'ports/todo-repository';
 import { ulid } from 'ulid';
 import { format } from 'date-fns';
 import logger from 'lib/logger';
+import { TodoStatus } from 'constants/todo/status';
 
 const handler = async (
     req: NextApiRequest,
