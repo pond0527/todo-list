@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { Layout } from 'components/Layout';
+import { FormContainer } from 'components/FormContainer';
 import { TodoStatus } from 'constants/todo/status';
 import { useFormContext } from 'react-hook-form';
 import { SelectOutput } from 'types/form';
@@ -23,7 +23,8 @@ export const TodoForm = ({
     statusList,
     memberList,
 }: Props) => {
-    const { register, getValues, setValue } = useFormContext<TodoFormType>();
+    const { register, getValues, setValue, formState } =
+        useFormContext<TodoFormType>();
 
     const targetTodoId: string | undefined = getValues('todoId');
     console.log('targetTodoId: ', targetTodoId);
@@ -46,13 +47,14 @@ export const TodoForm = ({
     };
 
     return (
-        <Layout
+        <FormContainer
             pageTitle={`TODO　${mode === 'new' ? '新規作成' : '編集'}`}
             rightItems={
                 <>
                     <button
                         type="button"
                         className={clsx('btn btn-primary', styles.btn)}
+                        disabled={!formState.isValid}
                         onClick={() => onSubmit(getValues())}
                     >
                         保存
@@ -170,6 +172,6 @@ export const TodoForm = ({
                     </div>
                 </div>
             </form>
-        </Layout>
+        </FormContainer>
     );
 };

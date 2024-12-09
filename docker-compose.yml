@@ -5,17 +5,21 @@ services:
     build:
       context: ./
       dockerfile: ./Dockerfile.front
+    env_file:
+      front/.env.product
     volumes:
       - ./front/share:/app/share
     ports:
       - "127.0.0.1:3000:3000"
     depends_on:
       - mysql
+    networks:
+      - app-net
   mysql:
     build:
       context: ./
       dockerfile: ./Dockerfile.db
-    # container_name: mysql
+    container_name: mysql
     ports:
       - 13306:3306
     command: --default-authentication-plugin=mysql_native_password
@@ -26,3 +30,8 @@ services:
       - database/.password.env
     cap_add:
       - SYS_NICE
+    networks:
+      - app-net
+networks:
+  app-net:
+    driver: bridge

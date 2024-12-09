@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { Layout } from 'components/Layout';
+import { FormContainer } from 'components/FormContainer';
 import { useFormContext } from 'react-hook-form';
 import { MemberFormType } from 'types/todo/type.d';
 import styles from './member.module.scss';
@@ -36,7 +36,7 @@ export const MemberForm = ({ mode, onComplete, onBack }: Props) => {
     };
 
     return (
-        <Layout
+        <FormContainer
             pageTitle={`担当者　${mode === 'new' ? '新規作成' : '編集'}`}
             rightItems={
                 <>
@@ -80,6 +80,6 @@ export const MemberForm = ({ mode, onComplete, onBack }: Props) => {
                     </div>
                 </div>
             </form>
-        </Layout>
+        </FormContainer>
     );
 };
