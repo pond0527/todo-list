@@ -19,6 +19,7 @@ const handler = async (
                         ({
                             memberId: data.member_id,
                             name: data.name,
+                            isDeleted: data.is_deleted,
                         } as MemberApiData),
                 ),
             });

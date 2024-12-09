@@ -12,3 +12,14 @@ export const getMemberList = async (): Promise<MemberApiData[]> => {
 
     return responseBody.data;
 };
+
+export const getMember = async (memberId: string): Promise<MemberApiData> => {
+    const response = await fetch(`http://localhost:3000/api/member/${memberId}`, {
+        method: 'GET',
+    });
+
+    const responseBody =
+        (await response.json()) as ApiResoinse<MemberApiData>;
+
+    return responseBody.data;
+};

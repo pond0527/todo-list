@@ -18,11 +18,7 @@
 }
 
 .dataRow {
-    &.warn {
-        background-color: lightyellow;
-    }
-
-    &.done {
+    &.deleted {
         background-color: lightGray;
     }
 }

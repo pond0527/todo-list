@@ -1,23 +1,23 @@
+import clsx from 'clsx';
+import { Layout } from 'components/Layout';
+import { TodoForm } from 'components/Todo';
+import styles from 'components/Todo/todo.module.scss';
+import { TODO_STATUS_LIST, TodoStatus } from 'constants/todo/status';
+import { format } from 'date-fns';
+import { getMemberList } from 'lib/clients/memberClient';
+import { getTodoList } from 'lib/clients/todoClient';
+import { useToast } from 'lib/toast';
+import type { GetServerSidePropsResult } from 'next';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { useCallback, useEffect, useState } from 'react';
+import { FormProvider, useForm } from 'react-hook-form';
+import ReactModal from 'react-modal';
 import {
     MemberApiData,
     TodoFormType,
     TodoListJsonData,
 } from 'types/todo/type.d';
-import styles from 'components/Todo/todo.module.scss';
-import clsx from 'clsx';
-import { Layout } from 'components/Layout';
-import { useCallback, useEffect, useState } from 'react';
-import type { GetServerSidePropsResult } from 'next';
-import ReactModal from 'react-modal';
-import { useToast } from 'lib/toast';
-import { TodoForm } from 'components/Todo';
-import { FormProvider, useForm } from 'react-hook-form';
-import { useRouter } from 'next/router';
-import Link from 'next/link';
-import { getTodoList } from 'lib/clients/todoClient';
-import { getMemberList } from 'lib/clients/memberClient';
-import { format } from 'date-fns';
-import { TODO_STATUS_LIST, TodoStatus } from 'constants/todo/status';
 
 type TodoFilter = Partial<
     Pick<TodoListJsonData, 'title' | 'status' | 'assignmentMemberId'>
@@ -42,7 +42,7 @@ const TodoList = ({ memberList }: Props) => {
         (async () => {
             const todoList = await getTodoList();
             setTodoList(todoList);
-            console.log("todoList, ", todoList);
+            console.log('todoList, ', todoList);
         })();
     }, [router.isReady]);
 
@@ -104,13 +104,13 @@ const TodoList = ({ memberList }: Props) => {
                         }}
                     />
                     <label className="form-check-label" htmlFor="defaultCheck1">
-                        完了済みのタスクも表示
+                        完了済みのタスクも含む
                     </label>
                 </div>
             </form>
 
             <div>
-                <div className='fw-bold mb-3'>全{todoList.length}件</div>
+                <div className="fw-bold mb-3">全{todoList.length}件</div>
                 <table className={clsx('table table-hover', styles.table)}>
                     <thead className={'table-light'}>
                         <tr>
@@ -126,7 +126,10 @@ const TodoList = ({ memberList }: Props) => {
                         {todoList
                             .filter((o) => {
                                 // フィルター1
-                                if (!filter.showDone && o.status === TodoStatus.Done) {
+                                if (
+                                    !filter.showDone &&
+                                    o.status === TodoStatus.Done
+                                ) {
                                     // 完了ステータスは非表示
                                     return null;
                                 } else {
@@ -153,7 +156,8 @@ const TodoList = ({ memberList }: Props) => {
                                         key={todo.todoId}
                                         className={clsx(
                                             styles.dataRow,
-                                            todo.status === TodoStatus.Done && styles.done,
+                                            todo.status === TodoStatus.Done &&
+                                                styles.done,
                                             todo.isWarning && styles.warn,
                                         )}
                                     >
@@ -172,7 +176,9 @@ const TodoList = ({ memberList }: Props) => {
                                         </td>
                                         <td>
                                             {memberList.find(
-                                                (o) => o.memberId === todo.assignmentMemberId,
+                                                (o) =>
+                                                    o.memberId ===
+                                                    todo.assignmentMemberId,
                                             )?.name || '-'}
                                         </td>
                                         <td>
@@ -184,9 +190,9 @@ const TodoList = ({ memberList }: Props) => {
                                         <td>
                                             {todo.updateAt
                                                 ? format(
-                                                    todo.updateAt,
-                                                    'yyyy-MM-dd HH:mm',
-                                                )
+                                                      todo.updateAt,
+                                                      'yyyy-MM-dd HH:mm',
+                                                  )
                                                 : '-'}
                                         </td>
                                     </tr>

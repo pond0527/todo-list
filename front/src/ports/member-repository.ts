@@ -2,13 +2,14 @@ import { Pool } from 'mysql2/promise';
 import { Member } from 'types/mysql/type';
 import { pool } from 'ports/database';
 import logger from 'lib/logger';
+import { TRUE } from 'sass';
 
 export interface MemberRepository {
     fetchAll(): Promise<Member[]>;
     fetchBy(memberId: string): Promise<Member | undefined>;
-    // register(member: Member): Promise<boolean>;
-    // update(member: Member): Promise<boolean>;
-    // deleteBy(memberId: string): Promise<boolean>;
+    register(member: Member): Promise<boolean>;
+    update(member: Member): Promise<boolean>;
+    deleteBy(memberId: string): Promise<boolean>;
 }
 
 const MemberRepositoryImpl = (pool: Pool): MemberRepository => {
@@ -34,59 +35,60 @@ const MemberRepositoryImpl = (pool: Pool): MemberRepository => {
         return results[0];
     };
 
-    // const register = async (member: Member): Promise<boolean> => {
-    //     try {
-    //         const con = await pool.getConnection();
+    const register = async (member: Member): Promise<boolean> => {
+        try {
+            const con = await pool.getConnection();
 
-    //         await con.query(
-    //             'insert into member values(:member_id, :name, :is_deleted)',
-    //             { ...member },
-    //         );
-    //         return true;
-    //     } catch (e: any) {
-    //         logger.error(e);
-    //         return false;
-    //     }
-    // };
+            await con.query(
+                'insert into member values(:member_id, :name, :is_deleted)',
+                { ...member },
+            );
 
-    // const update = async (member: Member): Promise<boolean> => {
-    //     try {
-    //         const con = await pool.getConnection();
-    //         await con.query(
-    //             'update member set name = :name, is_deleted = :is_deleted where member_id = :member_id',
-    //             { ...member },
-    //         );
-    //         return false;
-    //     } catch (e: any) {
-    //         logger.error(e);
-    //         return false;
-    //     }
-    // };
+            return true;
+        } catch (e: any) {
+            logger.error(e);
+            return false;
+        }
+    };
 
-    // const deleteBy = async (memberId: string): Promise<boolean> => {
-    //     try {
-    //         const con = await pool.getConnection();
+    const update = async (member: Member): Promise<boolean> => {
+        try {
+            const con = await pool.getConnection();
+            await con.query(
+                'update member set name = :name where member_id = :member_id',
+                { ...member },
+            );
+            return true;
+        } catch (e: any) {
+            logger.error(e);
+            return false;
+        }
+    };
 
-    //         await con.query(
-    //             'update member set is_deleted = true where member_id = :member_id',
-    //             {
-    //                 member_id: memberId,
-    //             },
-    //         );
+    const deleteBy = async (memberId: string): Promise<boolean> => {
+        try {
+            const con = await pool.getConnection();
 
-    //         return true;
-    //     } catch (e: any) {
-    //         logger.error(e);
-    //         return false;
-    //     }
-    // };
+            await con.query(
+                'update member set is_deleted = true where member_id = :member_id',
+                {
+                    member_id: memberId,
+                },
+            );
+
+            return true;
+        } catch (e: any) {
+            logger.error(e);
+            return false;
+        }
+    };
 
     return {
         fetchAll,
         fetchBy,
-        // register,
-        // update,
-        // deleteBy,
+        register,
+        update,
+        deleteBy,
     };
 };
 
