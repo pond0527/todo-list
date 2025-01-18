@@ -1,5 +1,5 @@
 import { Pool } from 'mysql2/promise';
-import { Member } from 'types/mysql/type';
+import { Member } from 'types/mysql/todo';
 import { pool } from 'ports/database';
 import logger from 'lib/logger';
 import { TRUE } from 'sass';

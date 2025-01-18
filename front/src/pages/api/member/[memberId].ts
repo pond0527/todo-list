@@ -1,7 +1,7 @@
 import { MemberApiData, MemberFormType } from 'types/todo/type.d';
 import { ApiResoinse } from 'types/api/type.d';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { Member } from 'types/mysql/type';
+import { Member } from 'types/mysql/todo';
 import logger from 'lib/logger';
 import memberRepository from 'ports/member-repository';
 import { ulid } from 'ulid';

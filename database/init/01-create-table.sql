@@ -26,3 +26,18 @@ CREATE TABLE IF NOT EXISTS todo_group (
   is_deleted BOOLEAN NOT NULL DEFAULT false,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+
+
+
+-- next auth(session)
+-- TODO: スキーマ分離
+-- USE user;
+CREATE TABLE  IF NOT EXISTS  user(
+  user_id VARCHAR(26) PRIMARY KEY,
+  name VARCHAR(255),
+  password TEXT NOT NULL, -- 暗号化
+  salt  TEXT NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);

@@ -13,7 +13,7 @@ type Props = {
 };
 
 export const MemberForm = ({ mode, onComplete, onBack }: Props) => {
-    const { register, getValues } = useFormContext<MemberFormType>();
+    const { register, getValues, formState } = useFormContext<MemberFormType>();
 
     const targetMemberId: string | undefined = getValues('memberId');
     console.log('targetTodoId: ', targetMemberId);
@@ -43,6 +43,7 @@ export const MemberForm = ({ mode, onComplete, onBack }: Props) => {
                     <button
                         type="button"
                         className={clsx('btn btn-primary', styles.btn)}
+                        disabled={!formState.isValid}
                         onClick={() => onSubmit(getValues())}
                     >
                         保存

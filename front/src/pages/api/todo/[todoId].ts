@@ -5,7 +5,7 @@ import {
 } from 'types/todo/type.d';
 import { ApiResoinse } from 'types/api/type.d';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { Todo } from 'types/mysql/type';
+import { Todo } from 'types/mysql/todo';
 import todoRepository from 'ports/todo-repository';
 import { ulid } from 'ulid';
 import { format } from 'date-fns';

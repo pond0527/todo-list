@@ -6,10 +6,7 @@ import { GetServerSidePropsResult } from 'next';
 import { useRouter } from 'next/router';
 import { useLayoutEffect } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import {
-    MemberApiData,
-    TodoFormType,
-} from 'types/todo/type';
+import { MemberApiData, TodoFormType } from 'types/todo/type';
 
 type Props = {
     memberList: MemberApiData[];
@@ -31,7 +28,6 @@ const EditTodo = ({ memberList }: Props) => {
             console.log(todoId, todo);
         })();
     }, [router.isReady, todoId, useFormMethods]);
-
 
     return (
         <FormProvider {...useFormMethods}>

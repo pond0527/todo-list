@@ -47,7 +47,7 @@ const TodoList = ({ memberList }: Props) => {
     }, [router.isReady]);
 
     const [isOpenFormModal, setIsOpenFormModal] = useState(false);
-    const { toast, Toaster } = useToast();
+    const { toast } = useToast();
 
     const useFormMethods = useForm<TodoFormType>();
 
@@ -220,7 +220,6 @@ const TodoList = ({ memberList }: Props) => {
                     />
                 </FormProvider>
             </ReactModal>
-            <Toaster />
         </Layout>
     );
 };
