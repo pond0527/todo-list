@@ -9,9 +9,15 @@ type Props = {
     pageTitle: string;
     rightItems?: ReactNode;
     children: ReactNode;
+    showTopLink?: boolean;
 };
 
-export const Layout = ({ pageTitle, rightItems, children }: Props) => {
+export const Layout = ({
+    pageTitle,
+    rightItems,
+    showTopLink = true,
+    children,
+}: Props) => {
     useEffect(() => {
         document.title = pageTitle;
     }, [pageTitle]);
@@ -20,9 +26,11 @@ export const Layout = ({ pageTitle, rightItems, children }: Props) => {
 
     return (
         <>
-            <div>
-                <Link href="/">トップへ</Link>
-            </div>
+            {showTopLink && (
+                <div>
+                    <Link href="/">トップへ</Link>
+                </div>
+            )}
 
             <div
                 className={clsx('container-xl container-sm', styles.container)}

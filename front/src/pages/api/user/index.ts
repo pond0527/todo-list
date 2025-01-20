@@ -3,24 +3,45 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { ApiResoinse } from 'types/api/type.d';
 import userRepository from 'ports/user-repository';
 import { User } from 'types/mysql/user';
-import { UserFormType } from 'types/user/type';
+import { UserApiData, UserFormType } from 'types/user/type';
 import { ulid } from 'ulid';
 import { passwordToHash } from 'domain/user/password';
 import logger from 'lib/logger';
 
-export default async function signup(
+const handler = async (
     req: NextApiRequest,
-    res: NextApiResponse<ApiResoinse<boolean>>,
-) {
-    if (req.method === 'POST') {
+    res: NextApiResponse<ApiResoinse<Array<UserApiData> | boolean>>,
+) => {
+    if (req.method === 'GET') {
+        try {
+            const userList = await userRepository.fetchAll();
+            logger.info({ userList: userList }, 'Get: userList');
+
+            res.status(200).send({
+                data: userList.map(
+                    (data) =>
+                        ({
+                            userId: data.user_id,
+                            name: data.name,
+                            password: data.password,
+                            createAt: data.created_at,
+                            updateAt: data.updated_at,
+                        } as UserApiData),
+                ),
+            });
+        } catch (e) {
+            logger.warn(e);
+            res.status(200).send({ data: [] });
+        }
+    } else if (req.method === 'POST') {
         // ユーザー登録
         const form = JSON.parse(req.body) as UserFormType;
 
         const allUser = await userRepository.fetchAll();
-        const existsUser = allUser.some(u => u.name === form.name);
-        if(existsUser) {
+        const existsUser = allUser.some((u) => u.name === form.name);
+        if (existsUser) {
             logger.warn('exists user');
-            res.status(400);
+            res.status(400).end();
             return;
         }
 
@@ -37,7 +58,8 @@ export default async function signup(
         const isSuccess = await userRepository.register(registData);
         res.status(200).json({ data: isSuccess });
     } else {
-        res.status(405);
+        res.status(405).end();
     }
-}
+};
 
+export default handler;

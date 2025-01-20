@@ -1,12 +1,12 @@
 export type UserFormType = Pick<
-    UserListJsonData,
+    UserApiData,
     'userId' | 'name' | 'password' // 複合化状態(画面入力値)
 >;
 
-export type UserListJsonData = {
+export type UserApiData = {
     userId: string;
     name: string;
-    password: TodoStatusType; // 暗号化状態
+    password: string; // 暗号化状態
     createAt: Date;
     updateAt: Date;
 };

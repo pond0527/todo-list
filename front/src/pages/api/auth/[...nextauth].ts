@@ -2,7 +2,7 @@ import logger from 'lib/logger';
 import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import userRepository from 'ports/user-repository';
-import { passwordCompare, passwordToHash } from 'domain/user/password';
+import { passwordCompare } from 'domain/user/password';
 
 export default NextAuth({
     providers: [

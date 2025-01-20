@@ -38,7 +38,7 @@ const handler = async (
     } else if (req.method === 'PUT') {
         if (memberId == null) {
             logger.warn('required memberId');
-            res.status(400);
+            res.status(400).end();
             return;
         }
 
@@ -55,7 +55,7 @@ const handler = async (
     } else if (req.method === 'GET') {
         if (memberId == null) {
             logger.warn('required memberId');
-            res.status(400);
+            res.status(400).end();
             return;
         }
 
@@ -72,19 +72,19 @@ const handler = async (
             });
         } else {
             logger.warn(`not found, memberId=${memberId}`);
-            res.status(404);
+            res.status(404).end();
         }
     } else if (req.method === 'DELETE') {
         if (memberId == null) {
             logger.warn('required memberId');
-            res.status(400);
+            res.status(400).end();
             return;
         }
 
         const isSuccess = await memberRepository.deleteBy(memberId.toString());
         res.status(200).json({ data: isSuccess });
     } else {
-        res.status(403);
+        res.status(403).end();
     }
 };
 

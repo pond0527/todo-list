@@ -1,4 +1,4 @@
-import { TodoListJsonData } from 'types/todo/type.d';
+import { TodoJsonData } from 'types/todo/type.d';
 import { ApiResoinse } from 'types/api/type.d';
 import { NextApiRequest, NextApiResponse } from 'next';
 import todoRepository from 'ports/todo-repository';
@@ -6,7 +6,7 @@ import logger from 'lib/logger';
 
 const handler = async (
     req: NextApiRequest,
-    res: NextApiResponse<ApiResoinse<TodoListJsonData[]>>,
+    res: NextApiResponse<ApiResoinse<TodoJsonData[]>>,
 ) => {
     if (req.method === 'GET') {
         try {
@@ -25,7 +25,7 @@ const handler = async (
                             detail: data.detail,
                             createAt: data.created_at,
                             updateAt: data.updated_at,
-                        } as TodoListJsonData),
+                        } as TodoJsonData),
                 ),
             });
         } catch (e) {
@@ -33,7 +33,7 @@ const handler = async (
             res.status(200).send({ data: [] });
         }
     } else {
-        res.status(403);
+        res.status(403).end();
     }
 };
 
