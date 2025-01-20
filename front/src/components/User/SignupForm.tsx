@@ -21,6 +21,7 @@ export const SignupForm = ({ onComplete }: Props) => {
             const isSuccess = await registerUser(getValues());
             if (isSuccess) {
                 toast.success('保存しました。');
+                onComplete?.();
             } else {
                 toast.error(`エラーが発生しました。（原因不明）`);
             }
