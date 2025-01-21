@@ -5,41 +5,19 @@ import Link from 'next/link';
 
 const Home = () => {
     const { status } = useSession();
+    const isSignin = status === 'authenticated';
 
     const wrapContainer = () => {
-        if (status === 'authenticated') {
+        if (isSignin) {
             return (
-                <div className="container">
-                    <div className="row">
-                        <div className="col-12 mb-4">
-                            <ul>
-                                <li>
-                                    <Link href="/todo">TODO</Link>
-                                </li>
-                                {/* <li>
-                    <Link href="/member">担当者リスト</Link>
-                </li> */}
-                                <li>
-                                    <Link href="/user">ユーザー</Link>
-                                </li>
-                                {/* <li>
-                                <Link href="#" onClick={() => signOut()}>
-                                    サインアウト
-                                </Link>
-                            </li> */}
-                            </ul>
-                        </div>
-                        <div className="col-12">
-                            <button
-                                type="button"
-                                className="btn btn-primary btn-sm"
-                                onClick={() => signOut()}
-                            >
-                                サインアウト
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                <ul>
+                    <li>
+                        <Link href="/todo">TODO</Link>
+                    </li>
+                    <li>
+                        <Link href="/user">ユーザー</Link>
+                    </li>
+                </ul>
             );
         } else {
             return (
@@ -56,7 +34,23 @@ const Home = () => {
     };
 
     return (
-        <Layout pageTitle="メニュー" showTopLink={false}>
+        <Layout
+            pageTitle="メニュー"
+            showTopLink={false}
+            rightItems={
+                <>
+                    {isSignin && (
+                        <button
+                            type="button"
+                            className="btn btn-primary"
+                            onClick={() => signOut()}
+                        >
+                            サインアウト
+                        </button>
+                    )}
+                </>
+            }
+        >
             {wrapContainer()}
         </Layout>
     );
