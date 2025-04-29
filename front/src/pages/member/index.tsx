@@ -33,7 +33,7 @@ const MemberList = () => {
     }, [router.isReady]);
 
     const [isOpenFormModal, setIsOpenFormModal] = useState(false);
-    const { toast, Toaster } = useToast();
+    const { toast } = useToast();
 
     const useFormMethods = useForm<MemberFormType>();
 
@@ -152,7 +152,6 @@ const MemberList = () => {
                     />
                 </FormProvider>
             </ReactModal>
-            <Toaster />
         </Layout>
     );
 };

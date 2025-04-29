@@ -6,6 +6,7 @@ import { TODO_STATUS_LIST, TodoStatus } from 'constants/todo/status';
 import { format } from 'date-fns';
 import { getMemberList } from 'lib/clients/memberClient';
 import { getTodoList } from 'lib/clients/todoClient';
+import { getUserList } from 'lib/clients/userClient';
 import { useToast } from 'lib/toast';
 import type { GetServerSidePropsResult } from 'next';
 import Link from 'next/link';
@@ -13,25 +14,23 @@ import { useRouter } from 'next/router';
 import { useCallback, useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import ReactModal from 'react-modal';
-import {
-    MemberApiData,
-    TodoFormType,
-    TodoListJsonData,
-} from 'types/todo/type.d';
+import { MemberApiData, TodoFormType, TodoJsonData } from 'types/todo/type.d';
+import { UserApiData } from 'types/user/type';
 
 type TodoFilter = Partial<
-    Pick<TodoListJsonData, 'title' | 'status' | 'assignmentMemberId'>
+    Pick<TodoJsonData, 'title' | 'status' | 'assignmentMemberId'>
 > & {
     showDone: boolean;
 };
 
 type Props = {
     memberList: MemberApiData[];
+    userList: UserApiData[];
 };
 
-const TodoList = ({ memberList }: Props) => {
+const TodoList = ({ memberList, userList }: Props) => {
     const router = useRouter();
-    const [todoList, setTodoList] = useState<TodoListJsonData[]>([]);
+    const [todoList, setTodoList] = useState<TodoJsonData[]>([]);
     const [filter, setFilter] = useState<TodoFilter>({ showDone: false });
 
     useEffect(() => {
@@ -47,7 +46,7 @@ const TodoList = ({ memberList }: Props) => {
     }, [router.isReady]);
 
     const [isOpenFormModal, setIsOpenFormModal] = useState(false);
-    const { toast, Toaster } = useToast();
+    const { toast } = useToast();
 
     const useFormMethods = useForm<TodoFormType>();
 
@@ -175,9 +174,9 @@ const TodoList = ({ memberList }: Props) => {
                                             {todo.detail}
                                         </td>
                                         <td>
-                                            {memberList.find(
+                                            {userList.find(
                                                 (o) =>
-                                                    o.memberId ===
+                                                    o.userId ===
                                                     todo.assignmentMemberId,
                                             )?.name || '-'}
                                         </td>
@@ -214,13 +213,13 @@ const TodoList = ({ memberList }: Props) => {
                     <TodoForm
                         mode={'new'}
                         memberList={memberList}
+                        userList={userList}
                         statusList={TODO_STATUS_LIST}
                         onComplete={handleComplete}
                         onBack={handleBack}
                     />
                 </FormProvider>
             </ReactModal>
-            <Toaster />
         </Layout>
     );
 };
@@ -231,7 +230,9 @@ export const getServerSideProps = async (): Promise<
     GetServerSidePropsResult<Props>
 > => {
     const memberList = await getMemberList();
+    const userList = await getUserList();
+
     return {
-        props: { memberList },
+        props: { memberList, userList },
     };
 };

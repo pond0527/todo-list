@@ -1,11 +1,11 @@
 import {
-    TodoListJsonData,
+    TodoJsonData,
     TodoFormType,
     TodoStatusType,
 } from 'types/todo/type.d';
 import { ApiResoinse } from 'types/api/type.d';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { Todo } from 'types/mysql/type';
+import { Todo } from 'types/mysql/todo';
 import todoRepository from 'ports/todo-repository';
 import { ulid } from 'ulid';
 import { format } from 'date-fns';
@@ -14,7 +14,7 @@ import { TodoStatus } from 'constants/todo/status';
 
 const handler = async (
     req: NextApiRequest,
-    res: NextApiResponse<ApiResoinse<boolean | TodoListJsonData>>,
+    res: NextApiResponse<ApiResoinse<boolean | TodoJsonData>>,
 ) => {
     console.log(req.query, req.body);
 
@@ -48,7 +48,7 @@ const handler = async (
                     detail: registData.detail,
                     createAt: new Date(registData.created_at),
                     updateAt: new Date(registData.updated_at),
-                } as TodoListJsonData,
+                } as TodoJsonData,
             });
         } else {
             res.status(200).json({ data: false });
@@ -56,7 +56,7 @@ const handler = async (
     } else if (req.method === 'PUT') {
         if (todoId == null) {
             logger.warn('required totoId');
-            res.status(400);
+            res.status(400).end();
             return;
         }
 
@@ -78,7 +78,7 @@ const handler = async (
     } else if (req.method === 'GET') {
         if (todoId == null) {
             logger.warn('required totoId');
-            res.status(400);
+            res.status(400).end();
             return;
         }
 
@@ -98,11 +98,11 @@ const handler = async (
                     detail: todo.detail,
                     createAt: new Date(todo.created_at),
                     updateAt: new Date(todo.updated_at),
-                } as unknown as TodoListJsonData,
+                } as unknown as TodoJsonData,
             });
         } else {
             logger.warn(`not found, todoId=${todoId}`);
-            res.status(404);
+            res.status(404).end();
         }
     } else if (req.method === 'DELETE') {
         if (todoId == null) {
@@ -114,7 +114,7 @@ const handler = async (
         const isSuccess = await todoRepository.deleteBy(todoId.toString());
         res.status(200).json({ data: isSuccess });
     } else {
-        res.status(403);
+        res.status(403).end();
     }
 };
 

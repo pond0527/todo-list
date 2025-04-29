@@ -4,6 +4,7 @@ import { TodoStatus } from 'constants/todo/status';
 import { useFormContext } from 'react-hook-form';
 import { SelectOutput } from 'types/form';
 import { MemberApiData, TodoFormType, TodoStatusType } from 'types/todo/type.d';
+import { UserApiData } from 'types/user/type';
 import styles from './todo.module.scss';
 
 type Mode = 'new' | 'edit';
@@ -11,6 +12,7 @@ type Mode = 'new' | 'edit';
 type Props = {
     mode: Mode;
     memberList: MemberApiData[];
+    userList: UserApiData[];
     statusList: SelectOutput[];
     onComplete?: VoidFunction;
     onBack?: VoidFunction;
@@ -22,6 +24,7 @@ export const TodoForm = ({
     onBack,
     statusList,
     memberList,
+    userList,
 }: Props) => {
     const { register, getValues, setValue, formState } =
         useFormContext<TodoFormType>();
@@ -149,12 +152,9 @@ export const TodoForm = ({
                             })}
                             defaultValue="0"
                         >
-                            {memberList.map((member) => (
-                                <option
-                                    key={member.memberId}
-                                    value={member.memberId}
-                                >
-                                    {member.name}
+                            {userList.map((user) => (
+                                <option key={user.userId} value={user.userId}>
+                                    {user.name}
                                 </option>
                             ))}
                         </select>

@@ -1,7 +1,7 @@
 import { TodoStatus } from 'constants/todo/status';
 
 export type TodoFormType = Pick<
-    TodoListJsonData,
+    TodoJsonData,
     | 'todoId'
     | 'title'
     | 'status'
@@ -12,7 +12,7 @@ export type TodoFormType = Pick<
 
 export type TodoStatusType = keyof typeof TodoStatus;
 
-export type TodoListJsonData = {
+export type TodoJsonData = {
     todoId?: string;
     title: string;
     status: TodoStatusType;

@@ -28,7 +28,7 @@ const handler = async (
             res.status(200).send({ data: [] });
         }
     } else {
-        res.status(403);
+        res.status(403).end();
     }
 };
 
